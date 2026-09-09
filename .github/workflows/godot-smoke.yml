@@ -42,10 +42,11 @@ jobs:
       - name: Import project in editor mode
         run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
 
-      - name: Render Phase 3 screenshot
+      - name: Render Phase 3 screenshot under Xvfb
         run: |
           mkdir -p artifacts
-          timeout 30s godot --headless --rendering-method gl_compatibility --path . --script ci/phase3_screenshot.gd
+          timeout 45s xvfb-run -a -s '-screen 0 1280x720x24' \
+            godot --rendering-method gl_compatibility --path . --script ci/phase3_screenshot.gd
 
       - name: Package reconstructed runner project
         run: |
