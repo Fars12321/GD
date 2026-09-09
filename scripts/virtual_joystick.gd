@@ -10,12 +10,26 @@ signal joystick_input(vector: Vector2)
 var _touch_index: int = -1
 var _center: Vector2
 var _knob_position: Vector2
+var _player: Node = null
 
 func _ready() -> void:
 	_center = size / 2.0
 	_knob_position = _center
 	set_process_input(true)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	call_deferred("_connect_to_player")
+
+func _connect_to_player() -> void:
+	_player = get_tree().get_first_node_in_group("player")
+	if _player == null:
+		push_warning("VirtualJoystick: player group not found")
+		return
+	if not joystick_input.is_connected(_on_joystick_input):
+		joystick_input.connect(_on_joystick_input)
+
+func _on_joystick_input(vector: Vector2) -> void:
+	if _player != null and is_instance_valid(_player) and _player.has_method("set_joystick_input"):
+		_player.set_joystick_input(vector)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
