@@ -1,5 +1,5 @@
 extends CanvasLayer
-## واجهة قلب القلعة تُنشأ برمجيًا لتبقى متوافقة مع واجهة المشروع الحالية.
+## Dynamic castle health HUD.
 
 var bar: ProgressBar
 var label: Label
@@ -35,7 +35,7 @@ func _build_ui() -> void:
 	defeat_label.size = Vector2(1280, 90)
 	defeat_label.text = "سقط قلب القلعة\nانتهت المملكة"
 	defeat_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-defeat_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	defeat_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	defeat_label.add_theme_font_size_override("font_size", 36)
 	add_child(defeat_label)
 
