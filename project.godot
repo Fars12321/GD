@@ -1,0 +1,29 @@
+; إعدادات مشروع Godot 4 — لعبة "حصن المملكة" (اسم مؤقت)
+; تم ضبط المُصيِّر (Renderer) على gl_compatibility ليعمل على أوسع مدى من الهواتف (OpenGL ES 3.0)
+
+config_version=5
+
+[application]
+
+config/name="Village Defense"
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.3", "Mobile")
+boot_splash/bg_color=Color(0.1, 0.1, 0.12, 1)
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/handheld/orientation="landscape"
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
