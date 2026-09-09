@@ -13,8 +13,8 @@ func _init() -> void:
 
 	var tree := main.get_node("Tree_01")
 	var rock := main.get_node("Rock_01")
-	assert(tree.resource_type == tree.ResourceType.WOOD, "Tree must be wood")
-	assert(rock.resource_type == rock.ResourceType.STONE, "Rock must be stone")
+	assert(tree.resource_type == 0, "Tree must be wood")
+	assert(rock.resource_type == 1, "Rock must be stone")
 	assert(tree.get_remaining_amount() == 5, "Tree capacity must be 5")
 
 	player.register_nearby_resource(tree)
@@ -28,4 +28,4 @@ func _init() -> void:
 	assert(rock.get_remaining_amount() == 7, "Rock must lose one unit")
 
 	print("PHASE2_SMOKE_PASS")
-	quit()
+	quit(0)
