@@ -36,7 +36,7 @@ jobs:
           echo PHASE2_TREE_PASS
 
       - name: Run Phase 2 smoke test
-        run: godot --headless --path . --script ci/godot_smoke_phase2.gd
+        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase2.gd
 
       - name: Import project in editor mode
         run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
