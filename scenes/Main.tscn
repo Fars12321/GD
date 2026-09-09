@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="2_player"]
@@ -18,8 +18,50 @@ size = Vector3(40, 1, 40)
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(40, 40)
 
+[sub_resource type="StandardMaterial3D" id="GroundMaterial"]
+albedo_color = Color(0.19, 0.24, 0.18, 1)
+roughness = 0.92
+
+[sub_resource type="Environment" id="Environment_world"]
+background_mode = 1
+background_color = Color(0.075, 0.11, 0.17, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.7, 0.76, 0.86, 1)
+ambient_light_energy = 0.72
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="BoxMesh" id="KeepMesh"]
+size = Vector3(3.0, 2.2, 3.0)
+
+[sub_resource type="BoxMesh" id="WallMesh"]
+size = Vector3(5.5, 1.25, 0.5)
+
+[sub_resource type="BoxMesh" id="TowerMesh"]
+size = Vector3(1.35, 4.0, 1.35)
+
+[sub_resource type="CylinderMesh" id="RoofMesh"]
+top_radius = 0.0
+bottom_radius = 1.15
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StoneMaterial"]
+albedo_color = Color(0.32, 0.35, 0.38, 1)
+roughness = 0.82
+
+[sub_resource type="StandardMaterial3D" id="WoodMaterial"]
+albedo_color = Color(0.28, 0.17, 0.1, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="RoofMaterial"]
+albedo_color = Color(0.22, 0.1, 0.08, 1)
+roughness = 0.76
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_world")
 
 [node name="Ground" type="StaticBody3D" parent="."]
 
@@ -29,10 +71,53 @@ shape = SubResource("BoxShape3D_ground")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_ground")
+material_override = SubResource("GroundMaterial")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 8, 0)
+rotation_degrees = Vector3(-48, -28, 0)
+light_energy = 1.05
+light_color = Color(1, 0.92, 0.78, 1)
 shadow_enabled = false
+
+[node name="CastleCore" type="Node3D" parent="."]
+position = Vector3(0, 0, -4.5)
+
+[node name="Keep" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(0, 1.1, 0)
+mesh = SubResource("KeepMesh")
+material_override = SubResource("StoneMaterial")
+
+[node name="KeepTower" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(0, 3.0, 0)
+mesh = SubResource("TowerMesh")
+material_override = SubResource("StoneMaterial")
+
+[node name="KeepRoof" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(0, 5.0, 0)
+mesh = SubResource("RoofMesh")
+material_override = SubResource("RoofMaterial")
+
+[node name="FrontWall" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(0, 0.65, 3.0)
+mesh = SubResource("WallMesh")
+material_override = SubResource("WoodMaterial")
+
+[node name="BackWall" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(0, 0.65, -3.0)
+mesh = SubResource("WallMesh")
+material_override = SubResource("StoneMaterial")
+
+[node name="LeftWall" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(-2.75, 0.65, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("WallMesh")
+material_override = SubResource("StoneMaterial")
+
+[node name="RightWall" type="MeshInstance3D" parent="CastleCore"]
+position = Vector3(2.75, 0.65, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("WallMesh")
+material_override = SubResource("StoneMaterial")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
