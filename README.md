@@ -5,23 +5,23 @@
 
 ---
 
-## ⬇️ تحميل اللعبة (Phase 1)
+## ⬇️ تحميل اللعبة
 
 | الملف | الحجم | الرابط |
 |---|---|---|
-| لعبة Phase 1 كاملة (كود + مجسّم الملك) | ~171 KB | `builds/GD_Phase1_game_only.zip` |
-| تحميل مباشر (GitHub — يتطلب الدخول للحساب لأن المستودع خاص) | — | https://github.com/Fars12321/GD/raw/arena/01a083a9-gd/builds/GD_Phase1_game_only.zip |
-| تنزيل كامل المشروع مضغوط (يشمل الأصول) | — | https://github.com/Fars12321/GD/archive/refs/heads/arena/01a083a9-gd.zip |
+| **Phase 2** — جمع الموارد + الواجهة (كود + أصول مستخدمة) | ~291 KB | `builds/GD_Phase2_game_only.zip` |
+| **Phase 1** — تحكم الملك والكاميرا (نسخة سابقة) | ~171 KB | `builds/GD_Phase1_game_only.zip` |
+| تحميل مباشر (GitHub — يتطلب الدخول لأن المستودع خاص) | — | https://github.com/Fars12321/GD/raw/arena/01a083a9-gd/builds/GD_Phase2_game_only.zip |
 
 > **ملاحظة:** المستودع **خاص (Private)** حاليًا، لذا تتطلب روابط GitHub تسجيل الدخول بحساب
 > يملك صلاحية الوصول. للتحميل الفوري دون GitHub، استخدم بطاقة المعاينة الحية
-> (Live Preview) الخاصة بجلسة التطوير في Arena ← مجلد `Game files download`.
+> (Live Preview) الخاصة بجلسة التطوير في Arena.
 
 **طريقة التشغيل بعد فك الضغط:**
 1. ثبّت **Godot 4.3 أو أحدث** (مجانًا من godotengine.org) إن لم يكن مثبتًا.
 2. افتح ملف `project.godot` داخل المجلد بمحرر Godot.
 3. اضغط **F5** لتشغيل اللعبة.
-4. التحكم: **WASD / الأسهم** أو **السحب بالفأرة** على الحاسوب — وعلى الهاتف اسحب بإصبعك فتظهر عصا التحكم.
+4. التحكم: **WASD / الأسهم** أو **السحب بالفأرة** على الحاسوب — وعلى الهاتف اسحب بإصبعك فتظهر عصا التحكم. اقترب من شجرة/صخرة وسيظهر زر **Collect** تلقائيًا.
 
 ---
 
@@ -49,6 +49,21 @@
 
 > ملفات ZIP الأصلية للأصول محفوظة على فرع `main`. أداة إعادة الاستخراج:
 > `python3 tools/extract_assets.py` (تُشغَّل وملفات ZIP في جذر المستودع).
+
+---
+
+## ✅ Phase 2 — نظام جمع الموارد والواجهة (منجز)
+
+| الملف | الوظيفة |
+|---|---|
+| `scenes/resource_node.tscn` + `scripts/resource_node.gd` | عقدة مورد (`Area3D` + `CollisionShape3D` كرة تفاعل) بنوعَين `WOOD/STONE`. الجمع `gather()` يخصم كمية، يشغّل صوت Kenney (`impactMining` للحجر / `impactWood` للخشب)، يهزّ المجسّم بـ Tween، وعند النفاد ينكمش ويُحذف `queue_free()`. يبث `resource_collected(type, amount)` |
+| `scenes/main.tscn` | 5 أشجار (`Tree_1_A` / `Tree_3_A`) + 5 صخور (`Rock_1_A` / `Rock_3_A`) من `res://assets/kaykit_forest_nature/` موزّعة حول القرية التجريبية |
+| `scripts/player.gd` | عدّادا `wood_count`/`stone_count`، فحص الموارد داخل مدى التفاعل وترتيبها، `get_nearest_resource()` / `gather_nearest()`، بث `resources_changed(wood, stone)` و`nearest_resource_changed(resource)` |
+| `scripts/ui.gd` + `scenes/ui.tscn` | شريط علوي بعدّادي الخشب والحجر + زر **Collect** كبير يظهر/يختفي تلقائيًا عند الاقتراب/الابتعاد عن مورد، مع تحديث الكمية المتبقية عليه |
+| `scripts/virtual_joystick.gd` | تحسين: لا تبدأ العصا فوق أزرار الواجهة (`ui_blockers`) — يدعم الضغط المتزامن: حركة بإصبع + جمع بإصبع آخر |
+
+**أصول مستخدمة فعليًا:** مجسّمات KayKit Forest (`Tree_1_A`, `Tree_3_A`, `Rock_1_A`, `Rock_3_A`)
+وأصوات Kenney Impact (`impactWood_medium_000`, `impactMining_000`) — كلها تحت `res://assets/`.
 
 ---
 
@@ -81,8 +96,9 @@
 
 ## 🗺️ خارطة الطريق المقترحة (تُنفَّذ مرحلة-بمرحلة)
 
-1. ✅ التحكم بالملك والكاميرا (هذه المرحلة).
-2. حركات المشي/التوقف من مكتبة `kaykit_character_animations` (Rig_Medium).
+1. ✅ التحكم بالملك والكاميرا (Phase 1).
+2. ✅ جمع الموارد (خشب/حجر) والواجهة (Phase 2).
+3. حركات المشي/التوقف من مكتبة `kaykit_character_animations` (Rig_Medium).
 3. بناء القرية: تنسيق أرضي، وضع مباني من حزم Kenney بنظام شبكة/تصادم.
 4. نظام تحديد وبناء المباني عبر اللمس + واجهة موارد.
 5. ذكاء اصطناعي: فلاحون/عمال، إدارة موارد، أعداء (KayKit Skeletons).

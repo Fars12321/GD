@@ -32,6 +32,10 @@ signal deactivated
 ## سُمك الإطار.
 @export var ring_width: float = 5.0
 
+## مجموعة عناصر الواجهة التي "تحتجز" اللمس (أزرار...) — لا تبدأ
+## العصا فوقها حتى لا تتعارض اللمستان (زر الجمع + عصا الحركة).
+const BLOCKER_GROUP := &"ui_blockers"
+
 @export_group("Behavior")
 ## النطاق الميت: أقل من هذه النسبة تُعتبر قيمة الصفر.
 @export_range(0.0, 0.5, 0.01) var deadzone: float = 0.12
@@ -83,6 +87,9 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 		# الإصبع الأول فقط يمسك العصا.
 		if is_active:
 			return
+		# لا نبدأ عصا فوق زر/عنصر واجهة يلتقط اللمسة (مثل زر الجمع).
+		if _is_pointer_over_blocker(event.position):
+			return
 		_start(event.position, event.index)
 	else:
 		if is_active and event.index == _touch_index:
@@ -99,11 +106,23 @@ func _handle_mouse(event: InputEventMouseButton) -> void:
 	if event.pressed:
 		if is_active:
 			return
+		if _is_pointer_over_blocker(event.position):
+			return
 		_using_touch = false
 		_start(event.position, -1)
 	else:
 		if is_active and not _using_touch:
 			_release()
+
+
+## هل النقطة فوق أي عنصر واجهة مسجّل في مجموعة "ui_blockers"؟
+func _is_pointer_over_blocker(pos_global: Vector2) -> bool:
+	for blocker in get_tree().get_nodes_in_group(BLOCKER_GROUP):
+		var control := blocker as Control
+		if control != null and control.is_visible_in_tree():
+			if control.get_global_rect().has_point(pos_global):
+				return true
+	return false
 
 
 func _start(pos_global: Vector2, index: int) -> void:
