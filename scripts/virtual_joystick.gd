@@ -1,4 +1,4 @@
-class_name GameJoystick
+class_name GDKJoystick
 extends Control
 ## ============================================================
 ## عصا تحكم افتراضية (Virtual Joystick) لمس الشاشة — للهواتف.

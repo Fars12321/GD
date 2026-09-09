@@ -7,9 +7,9 @@ extends Node3D
 ## وعلامات اختبار بصرية وإضاءة للتحقق من سلاسة التتبع.
 ## ============================================================
 
-@onready var king: Player = $King
-@onready var camera_rig: CameraRig = $CameraRig
-@onready var joystick: GameJoystick = $UI/Joystick
+@onready var king: GDKPlayer = $King
+@onready var camera_rig: GDKCameraRig = $CameraRig
+@onready var joystick: GDKJoystick = $UI/Joystick
 
 ## الحدود المربعة لمنطقة التجول (نصف الضلع). الأرضية 160 وحدة.
 @export var world_half_extent: float = 78.0

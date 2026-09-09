@@ -8,17 +8,17 @@ extends CanvasLayer
 ##   الابتعاد أو نفاد المورد.
 ## ============================================================
 
-## مسار الملك (Player) — يُضبط من المشهد.
+## مسار الملك (GDKPlayer) — يُضبط من المشهد.
 @export var player_path: NodePath = NodePath("../King")
 
-var _player: Player
+var _player: GDKPlayer
 
 @onready var _wood_label: Label = %WoodLabel
 @onready var _stone_label: Label = %StoneLabel
 @onready var _harvest_button: Button = %HarvestButton
 
 func _ready() -> void:
-	_player = get_node_or_null(player_path) as Player
+	_player = get_node_or_null(player_path) as GDKPlayer
 	if _player == null:
 		push_warning("ui.gd: player_path غير موجود: %s" % player_path)
 		return
@@ -45,7 +45,7 @@ func _on_resources_changed(wood: int, stone: int) -> void:
 
 
 ## إظهار/إخفاء زر الجمع حسب وجود مورد قريب، وتحديث نصّه.
-func _on_nearest_resource_changed(resource: ResourceNode) -> void:
+func _on_nearest_resource_changed(resource: GDKResourceNode) -> void:
 	if resource == null:
 		_harvest_button.hide()
 		return

@@ -1,4 +1,4 @@
-class_name ResourceNode
+class_name GDKResourceNode
 extends Area3D
 ## ============================================================
 ## عقدة مورد — شجرة (خشب) أو صخرة (حجر) قابلة للجمع.
@@ -13,7 +13,7 @@ extends Area3D
 ## ============================================================
 
 signal resource_collected(resource_type: int, amount: int)
-signal depleted(node: ResourceNode)
+signal depleted(node: GDKResourceNode)
 
 ## أنواع الموارد.
 enum ResourceType { WOOD, STONE }

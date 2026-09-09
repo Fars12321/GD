@@ -1,4 +1,4 @@
-class_name Player
+class_name GDKPlayer
 extends CharacterBody3D
 ## ============================================================
 ## الملك — شخصية قابلة للتحكم (CharacterBody3D).
@@ -16,7 +16,7 @@ signal idle_changed(is_idle: bool)
 ## تتغير عدّادات الموارد (تُطلق بعد كل جمع).
 signal resources_changed(wood: int, stone: int)
 ## أقرب مورد في متناول اليد تغيّر (يُمرَّر null عندما لا يوجد).
-signal nearest_resource_changed(resource: ResourceNode)
+signal nearest_resource_changed(resource: GDKResourceNode)
 
 @export_group("Movement")
 ## السرعة القصوى للمشي (متر/ثانية).
@@ -47,9 +47,9 @@ var _target_yaw: float = 0.0
 var _is_idle: bool = true
 
 ## الموارد المتاحة حالياً داخل نطاق التفاعل (مرتبة: الأقرب أولاً).
-var _nearby_resources: Array[ResourceNode] = []
+var _nearby_resources: Array[GDKResourceNode] = []
 ## أقرب مورد (آخر ما بُثّ للواجهة).
-var _nearest_resource: ResourceNode = null
+var _nearest_resource: GDKResourceNode = null
 ## قاموس العقد المرتبط بإشارة resource_collected (لمنع التكرار).
 var _connected_resources: Dictionary = {}
 
@@ -107,7 +107,7 @@ func _physics_process(delta: float) -> void:
 ## ============================================================
 
 ## أقرب مورد داخل نطاق التفاعل (أو null إن لم يوجد).
-func get_nearest_resource() -> ResourceNode:
+func get_nearest_resource() -> GDKResourceNode:
 	return _nearest_resource
 
 
@@ -136,7 +136,7 @@ func _update_nearby_resources() -> void:
 			_ensure_resource_connection(node)
 
 	# ترتيب تصاعدي حسب البعد عن الملك.
-	_nearby_resources.sort_custom(func(a: ResourceNode, b: ResourceNode) -> bool:
+	_nearby_resources.sort_custom(func(a: GDKResourceNode, b: GDKResourceNode) -> bool:
 		return global_position.distance_to(a.global_position) \
 				< global_position.distance_to(b.global_position))
 
@@ -146,7 +146,7 @@ func _update_nearby_resources() -> void:
 			_connected_resources.erase(key)
 
 	# بث تغيّر "أقرب مورد" إن تغيّر (مرة واحدة عند الدخول/الخروج).
-	var new_nearest: ResourceNode = _nearby_resources[0] \
+	var new_nearest: GDKResourceNode = _nearby_resources[0] \
 			if not _nearby_resources.is_empty() else null
 	if new_nearest != _nearest_resource:
 		_nearest_resource = new_nearest
@@ -154,7 +154,7 @@ func _update_nearby_resources() -> void:
 
 
 ## ربط إشارة الجمع مرة واحدة لكل مورد يدخل النطاق.
-func _ensure_resource_connection(node: ResourceNode) -> void:
+func _ensure_resource_connection(node: GDKResourceNode) -> void:
 	if _connected_resources.has(node):
 		return
 	node.resource_collected.connect(_on_resource_collected)
@@ -163,7 +163,7 @@ func _ensure_resource_connection(node: ResourceNode) -> void:
 
 ## عند جمع كمية من أي مورد: إضافتها للمخزن وبثّ التغيير.
 func _on_resource_collected(resource_type: int, amount: int) -> void:
-	if resource_type == ResourceNode.ResourceType.WOOD:
+	if resource_type == GDKResourceNode.ResourceType.WOOD:
 		wood_count += amount
 	else:
 		stone_count += amount
