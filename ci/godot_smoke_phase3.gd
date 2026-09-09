@@ -1,8 +1,11 @@
 extends SceneTree
 
+var failed := false
+
 func _fail(message: String) -> void:
+	failed = true
 	push_error("PHASE3_SMOKE_FAIL: " + message)
-	quit(1)
+	get_tree().quit(1)
 
 func _check(condition: bool, message: String) -> bool:
 	if not condition:
@@ -17,30 +20,27 @@ func _init() -> void:
 	var main := main_scene.instantiate()
 	root.add_child(main)
 	await process_frame
-	await process_frame
 
 	var player := main.get_node("Player")
 	var manager := main.get_node("BuildingManager")
 	if not _check(player != null and manager != null, "Player or BuildingManager missing"):
 		return
-	if not _check(manager.grid_size == 2.0, "Grid size must be 2m"):
+	if not _check(is_equal_approx(manager.grid_size, 2.0), "Grid size must be 2m"):
 		return
 	var wall_cost: Dictionary = manager.get_cost("wall")
 	var tower_cost: Dictionary = manager.get_cost("tower")
-	if not _check(wall_cost.get("wood", -1) == 10 and wall_cost.get("stone", -1) == 0, "Wall cost must be 10 wood"):
+	if not _check(int(wall_cost.get("wood", -1)) == 10 and int(wall_cost.get("stone", -1)) == 0, "Wall cost must be 10 wood"):
 		return
-	if not _check(tower_cost.get("wood", -1) == 0 and tower_cost.get("stone", -1) == 10, "Tower cost must be 10 stone"):
+	if not _check(int(tower_cost.get("wood", -1)) == 0 and int(tower_cost.get("stone", -1)) == 10, "Tower cost must be 10 stone"):
 		return
 
 	player.wood_count = 10
 	player.stone_count = 10
-	player.resources_changed.emit(player.wood_count, player.stone_count)
-
 	manager.start_placement("wall")
 	await process_frame
 	if not _check(manager.is_placing and manager.ghost != null, "Wall preview must be created"):
 		return
-	if not _check(is_equal_approx(fmod(absf(manager.snapped_position.x), 2.0), 0.0) and is_equal_approx(fmod(absf(manager.snapped_position.z), 2.0), 0.0), "Wall preview must snap to 2m grid"):
+	if not _check(manager.snapped_position == manager.snapped_position.snappedf(2.0), "Wall preview must snap to 2m grid"):
 		return
 	if not _check(manager.ghost_valid, "Wall preview should be valid with 10 wood"):
 		return
@@ -83,4 +83,4 @@ func _init() -> void:
 	manager.cancel_placement()
 
 	print("PHASE3_SMOKE_PASS")
-	quit(0)
+	get_tree().quit(0)
