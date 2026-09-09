@@ -29,12 +29,12 @@ func _try_attack_nearest_enemy() -> void:
 	var enemy := _get_nearest_enemy()
 	if enemy == null:
 		return
-	_attack_cooldown = attack_interval
 	var projectile_scene := preload("res://scenes/projectile.tscn") as PackedScene
 	var projectile := projectile_scene.instantiate() as Node3D
 	if projectile == null:
 		return
-	get_tree().current_scene.add_child(projectile)
+	_attack_cooldown = attack_interval
+	get_tree().root.add_child(projectile)
 	projectile.global_position = global_position + Vector3(0.0, 3.1, 0.0)
 	if projectile.has_method("setup"):
 		projectile.setup(enemy, attack_damage, projectile_speed)
