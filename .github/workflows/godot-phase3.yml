@@ -1,0 +1,54 @@
+name: Godot Phase 3 Grid Building
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ phase3-grid-building-review ]
+  pull_request:
+
+jobs:
+  godot-phase3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full asset repository
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.3
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Reconstruct project assets
+        run: bash ci/bootstrap_assets.sh
+
+      - name: Verify Phase 3 tree
+        run: |
+          test -f project.godot
+          test -f scenes/Main.tscn
+          test -f scenes/BuildingManager.tscn
+          test -f scenes/buildings/Wall.tscn
+          test -f scenes/buildings/Tower.tscn
+          test -f scripts/building_manager.gd
+          test -f scripts/mobile_ui.gd
+          ! test -f scripts/ui.gd
+          echo PHASE3_TREE_PASS
+
+      - name: Import project in editor mode
+        run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+
+      - name: Run Phase 3 smoke test
+        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase3.gd
+
+      - name: Package Phase 3 review artifact
+        run: |
+          mkdir -p artifacts
+          zip -qr artifacts/VillageDefense_Phase3_GridBuilding_Review.zip project.godot scenes scripts assets README.md
+
+      - name: Upload Phase 3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VillageDefense-Phase3-GridBuilding-Review
+          path: artifacts/
+          if-no-files-found: error
