@@ -35,11 +35,11 @@ jobs:
           ! test -d scenes/buildings
           echo PHASE2_TREE_PASS
 
-      - name: Run Phase 2 smoke test
-        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase2.gd
-
       - name: Import project in editor mode
         run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+
+      - name: Run Phase 2 smoke test
+        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase2.gd
 
       - name: Package Phase 2 review artifact
         run: |
