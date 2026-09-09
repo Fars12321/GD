@@ -1,11 +1,8 @@
 extends SceneTree
 
-var failed := false
-
 func _fail(message: String) -> void:
-	failed = true
 	push_error("PHASE3_SMOKE_FAIL: " + message)
-	get_tree().quit(1)
+	quit(1)
 
 func _check(condition: bool, message: String) -> bool:
 	if not condition:
@@ -23,7 +20,7 @@ func _init() -> void:
 
 	var player := main.get_node("Player")
 	var manager := main.get_node("BuildingManager")
-	if not _check(player != null and manager != null, "Player or BuildingManager missing"):
+	if not _check(player != null and manager != null and manager.get_script() != null, "Player or BuildingManager missing"):
 		return
 	if not _check(is_equal_approx(manager.grid_size, 2.0), "Grid size must be 2m"):
 		return
@@ -83,4 +80,4 @@ func _init() -> void:
 	manager.cancel_placement()
 
 	print("PHASE3_SMOKE_PASS")
-	get_tree().quit(0)
+	quit(0)
