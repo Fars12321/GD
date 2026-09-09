@@ -1,6 +1,11 @@
 extends CanvasLayer
-## Phase 3 mobile UI: resource counters, build menu, preview controls and gather.
+## Phase 4 mobile UI: resources, building, day/night timer, waves and king health.
 
+@onready var day_label: Label = $TopPanel/Margin/HBox/DayLabel
+@onready var phase_label: Label = $TopPanel/Margin/HBox/PhaseLabel
+@onready var time_label: Label = $TopPanel/Margin/HBox/TimeLabel
+@onready var wave_label: Label = $TopPanel/Margin/HBox/WaveLabel
+@onready var health_label: Label = $TopPanel/Margin/HBox/HealthLabel
 @onready var wood_label: Label = $TopPanel/Margin/HBox/WoodLabel
 @onready var stone_label: Label = $TopPanel/Margin/HBox/StoneLabel
 @onready var gather_button: Button = $GatherButton
@@ -13,10 +18,13 @@ extends CanvasLayer
 @onready var confirm_button: Button = $ConfirmButton
 @onready var cancel_button: Button = $CancelButton
 @onready var placement_status: Label = $PlacementStatus
+@onready var warning_label: Label = $WarningLabel
 
 var player: Node = null
 var building_manager: Node = null
+var day_night_manager: Node = null
 var current_target: Node = null
+var _is_night: bool = false
 
 func _ready() -> void:
 	gather_button.visible = false
@@ -24,6 +32,7 @@ func _ready() -> void:
 	confirm_button.visible = false
 	cancel_button.visible = false
 	build_menu.visible = false
+	warning_label.text = ""
 	target_label.text = "اقترب من شجرة أو صخرة"
 	gather_button.pressed.connect(_on_gather_button_pressed)
 	open_build_menu_button.pressed.connect(_on_open_build_menu_pressed)
@@ -34,6 +43,10 @@ func _ready() -> void:
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
 	call_deferred("_connect_to_player")
 	call_deferred("_connect_to_building_manager")
+	call_deferred("_connect_to_day_night")
+
+func _process(_delta: float) -> void:
+	wave_label.text = "☠ أعداء %d" % get_tree().get_nodes_in_group("enemy").size()
 
 func _connect_to_player() -> void:
 	player = get_tree().get_first_node_in_group("player")
@@ -44,8 +57,11 @@ func _connect_to_player() -> void:
 		player.resources_changed.connect(_on_resources_changed)
 	if player.has_signal("gather_target_changed"):
 		player.gather_target_changed.connect(_on_gather_target_changed)
+	if player.has_signal("health_changed"):
+		player.health_changed.connect(_on_health_changed)
 	_on_resources_changed(player.wood_count, player.stone_count)
 	_on_gather_target_changed(player.get_nearest_resource())
+	_on_health_changed(player.current_health, player.max_health)
 
 func _connect_to_building_manager() -> void:
 	building_manager = get_tree().get_first_node_in_group("building_manager")
@@ -60,10 +76,55 @@ func _connect_to_building_manager() -> void:
 		building_manager.placement_validity_changed.connect(_on_placement_validity_changed)
 	_update_build_buttons()
 
+func _connect_to_day_night() -> void:
+	day_night_manager = get_tree().get_first_node_in_group("day_night_manager")
+	if day_night_manager == null:
+		day_night_manager = get_tree().current_scene.get_node_or_null("DayNightManager")
+	if day_night_manager == null:
+		push_warning("MobileUI: DayNightManager not found")
+		return
+	if day_night_manager.has_signal("time_changed"):
+		day_night_manager.time_changed.connect(_on_time_changed)
+	if day_night_manager.has_signal("day_started"):
+		day_night_manager.day_started.connect(_on_day_started)
+	if day_night_manager.has_signal("night_started"):
+		day_night_manager.night_started.connect(_on_night_started)
+	_on_day_started(day_night_manager.current_day)
+
 func _on_resources_changed(wood: int, stone: int) -> void:
 	wood_label.text = "🪵  %d" % wood
 	stone_label.text = "🪨  %d" % stone
 	_update_build_buttons()
+
+func _on_health_changed(current: int, maximum: int) -> void:
+	health_label.text = "♥ %d/%d" % [current, maximum]
+
+func _on_day_started(day: int) -> void:
+	day_label.text = "اليوم %d" % day
+	phase_label.text = "☀ نهار"
+	warning_label.text = ""
+	phase_label.modulate = Color(0.95, 0.88, 0.58, 1.0)
+	_is_night = false
+
+func _on_night_started(day: int) -> void:
+	day_label.text = "اليوم %d" % day
+	phase_label.text = "☾ ليل"
+	phase_label.modulate = Color(0.56, 0.68, 1.0, 1.0)
+	warning_label.text = "⚠ بدأت موجة الليل — دافع عن القلعة!"
+	warning_label.modulate = Color(1.0, 0.55, 0.42, 1.0)
+	_is_night = true
+
+func _on_time_changed(seconds_left: float, _total: float, is_night: bool) -> void:
+	var seconds := maxi(0, int(ceil(seconds_left)))
+	time_label.text = "%02d:%02d" % [seconds / 60, seconds % 60]
+	if not is_night and seconds <= 10:
+		warning_label.text = "⚠ اقترب الليل — جهّز دفاعاتك!"
+		warning_label.modulate = Color(1.0, 0.72, 0.35, 1.0)
+	elif is_night:
+		_is_night = true
+		if get_tree().get_nodes_in_group("enemy").size() > 0:
+			warning_label.text = "☠ %d عدوًا داخل المعركة" % get_tree().get_nodes_in_group("enemy").size()
+			warning_label.modulate = Color(1.0, 0.45, 0.40, 1.0)
 
 func _on_gather_target_changed(target: Node) -> void:
 	current_target = target
