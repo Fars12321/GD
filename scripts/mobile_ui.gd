@@ -37,8 +37,12 @@ func _on_gather_target_changed(target: Node) -> void:
 	if target == null:
 		target_label.text = "اقترب من شجرة أو صخرة"
 		return
-	var resource_name := target.get_resource_name() if target.has_method("get_resource_name") else "مورد"
-	var remaining := target.get_remaining_amount() if target.has_method("get_remaining_amount") else 0
+	var resource_name: String = "مورد"
+	var remaining: int = 0
+	if target.has_method("get_resource_name"):
+		resource_name = str(target.get_resource_name())
+	if target.has_method("get_remaining_amount"):
+		remaining = int(target.get_remaining_amount())
 	target_label.text = "%s • متبقٍ %d" % [resource_name, remaining]
 	gather_button.text = "جمع %s" % resource_name
 
