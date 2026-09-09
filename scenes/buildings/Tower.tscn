@@ -16,6 +16,11 @@ script = ExtResource("1_script")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, 0)
 shape = SubResource("BoxShape3D_tower")
 
+[node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="."]
+radius = 1.1
+height = 5.1
+avoidance_enabled = true
+
 [node name="Base" parent="." instance=ExtResource("2_base")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
 
