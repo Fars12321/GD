@@ -1,5 +1,5 @@
 extends CharacterBody3D
-## سكربت الملك/اللاعب: حركة لمس + لوحة مفاتيح، جمع موارد، وصرف تكلفة البناء.
+## سكربت الملك/اللاعب: حركة لمس + جمع موارد + صحة ومكافآت Phase 4.
 
 @export var speed: float = 5.0
 @export var acceleration: float = 12.0
@@ -10,17 +10,22 @@ var joystick_vector: Vector2 = Vector2.ZERO
 
 @export var starting_wood: int = 6
 @export var starting_stone: int = 8
+@export var max_health: int = 100
 var wood_count: int = 0
 var stone_count: int = 0
+var current_health: int = 100
 var nearby_resources: Array = []
 
 signal resources_changed(wood: int, stone: int)
 signal gather_target_changed(target: Node)
+signal health_changed(current: int, maximum: int)
+signal player_defeated()
 
 func _ready() -> void:
 	add_to_group("player")
 	wood_count = starting_wood
 	stone_count = starting_stone
+	current_health = max_health
 
 func _physics_process(delta: float) -> void:
 	var input_vector: Vector2 = joystick_vector
@@ -42,6 +47,19 @@ func _physics_process(delta: float) -> void:
 
 func set_joystick_input(vector: Vector2) -> void:
 	joystick_vector = vector
+
+func add_resources(wood_amount: int, stone_amount: int) -> void:
+	wood_count += maxi(0, wood_amount)
+	stone_count += maxi(0, stone_amount)
+	resources_changed.emit(wood_count, stone_count)
+
+func take_damage(amount: int) -> void:
+	current_health = maxi(0, current_health - maxi(0, amount))
+	health_changed.emit(current_health, max_health)
+	if current_health <= 0:
+		player_defeated.emit()
+		current_health = max_health
+		health_changed.emit(current_health, max_health)
 
 func register_nearby_resource(resource_node: Node) -> void:
 	if resource_node in nearby_resources:

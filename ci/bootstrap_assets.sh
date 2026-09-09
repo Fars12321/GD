@@ -18,6 +18,7 @@ copy_named() {
 }
 
 NATURE=$(unpack 'KayKit_Forest_Nature_Pack_1.0_FREE.zip')
+SKELETONS=$(unpack 'KayKit-Character-Pack-Skeletons-1.0-main.zip')
 CASTLE=$(unpack 'kenney_castle-kit.zip')
 TOWN=$(unpack 'kenney_fantasy-town-kit_2.0.zip')
 HEX=$(unpack 'kenney_hexagon-kit.zip')
@@ -26,6 +27,9 @@ UIAUDIO=$(unpack 'kenney_ui-audio.zip')
 CARTO=$(unpack 'kenney_cartography-pack.zip')
 
 for name in Tree_1_A_Color1.gltf Tree_1_A_Color1.bin Tree_2_A_Color1.gltf Tree_2_A_Color1.bin Rock_1_A_Color1.gltf Rock_1_A_Color1.bin Rock_2_A_Color1.gltf Rock_2_A_Color1.bin forest_texture.png; do copy_named "$NATURE" "$name" "assets/models/nature/$name"; done
+copy_named "$SKELETONS" 'Skeleton_Warrior.glb' 'assets/characters/Skeleton_Warrior.glb'
+copy_named "$SKELETONS" 'skeleton_texture.png' 'assets/characters/skeleton_texture.png'
+copy_named "$SKELETONS" 'LICENSE.txt' 'assets/characters/KayKit-Skeletons-LICENSE.txt'
 for name in gate.glb rocks-large.glb rocks-small.glb tower-slant-roof.glb tower-square-base.glb tower-square-mid-door.glb wall-corner.glb wall-doorway.glb wall-half.glb wall.glb; do copy_named "$CASTLE" "$name" "assets/models/castle-kit/$name"; done
 for name in cart.glb chimney.glb fence.glb; do copy_named "$TOWN" "$name" "assets/models/fantasy-town-kit/$name"; done
 for name in unit-house.glb unit-tower.glb unit-tree.glb unit-wall-tower.glb; do copy_named "$HEX" "$name" "assets/models/hexagon-kit/$name"; done

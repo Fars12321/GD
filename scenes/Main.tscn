@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="2_player"]
@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://assets/models/nature/Rock_1_A_Color1.gltf" id="9_rock1"]
 [ext_resource type="PackedScene" path="res://assets/models/nature/Rock_2_A_Color1.gltf" id="10_rock2"]
 [ext_resource type="PackedScene" path="res://scenes/BuildingManager.tscn" id="11_buildmgr"]
+[ext_resource type="Script" path="res://scripts/day_night_manager.gd" id="12_daynight"]
+[ext_resource type="Script" path="res://scripts/wave_spawner.gd" id="13_waves"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(40, 1, 40)
@@ -30,6 +32,10 @@ ambient_light_color = Color(0.7, 0.76, 0.86, 1)
 ambient_light_energy = 0.72
 tonemap_mode = 2
 glow_enabled = true
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_world"]
+vertices = PackedVector3Array(-19, 0, -19, 19, 0, -19, 19, 0, 19, -19, 0, 19)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
 
 [sub_resource type="BoxMesh" id="KeepMesh"]
 size = Vector3(3.0, 2.2, 3.0)
@@ -72,6 +78,9 @@ shape = SubResource("BoxShape3D_ground")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_ground")
 material_override = SubResource("GroundMaterial")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_world")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-48, -28, 0)
@@ -133,6 +142,12 @@ target_path = NodePath("../Player")
 [node name="UI" parent="." instance=ExtResource("5_ui")]
 
 [node name="BuildingManager" parent="." instance=ExtResource("11_buildmgr")]
+
+[node name="DayNightManager" type="Node" parent="."]
+script = ExtResource("12_daynight")
+
+[node name="WaveSpawner" type="Node3D" parent="."]
+script = ExtResource("13_waves")
 
 [node name="Tree_01" parent="." instance=ExtResource("6_resnode")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -4)
