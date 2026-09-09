@@ -39,7 +39,7 @@ jobs:
         run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
 
       - name: Run Phase 3 smoke test
-        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase3.gd
+        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase3.gd --quit-after 120
 
       - name: Package Phase 3 review artifact
         run: |
