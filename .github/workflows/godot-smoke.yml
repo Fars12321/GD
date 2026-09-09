@@ -45,12 +45,12 @@ jobs:
       - name: Render Phase 3 screenshot
         run: |
           mkdir -p artifacts
-          godot --headless --rendering-method gl_compatibility --path . --script ci/phase3_screenshot.gd
+          timeout 30s godot --headless --rendering-method gl_compatibility --path . --script ci/phase3_screenshot.gd
 
       - name: Package reconstructed runner project
         run: |
           zip -qr artifacts/VillageDefense_Phase3_RunnerReady.zip \
-            project.godot README_Godot_Project.md scenes scripts assets
+            project.godot scenes scripts assets
 
       - name: Upload runner artifacts
         uses: actions/upload-artifact@v4
