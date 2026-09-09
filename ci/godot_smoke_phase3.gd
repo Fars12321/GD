@@ -20,7 +20,10 @@ func _init() -> void:
 
 	var player := main.get_node("Player")
 	var manager := main.get_node("BuildingManager")
+	var joystick := main.get_node("TouchControls/VirtualJoystick")
 	if not _check(player != null and manager != null and manager.get_script() != null, "Player or BuildingManager missing"):
+		return
+	if not _check(joystick != null, "VirtualJoystick missing"):
 		return
 	if not _check(is_equal_approx(manager.grid_size, 2.0), "Grid size must be 2m"):
 		return
@@ -29,6 +32,21 @@ func _init() -> void:
 	if not _check(int(wall_cost.get("wood", -1)) == 10 and int(wall_cost.get("stone", -1)) == 0, "Wall cost must be 10 wood"):
 		return
 	if not _check(int(tower_cost.get("wood", -1)) == 0 and int(tower_cost.get("stone", -1)) == 10, "Tower cost must be 10 stone"):
+		return
+
+	# Mobile joystick integration: simulate a full-right stick position and release.
+	await process_frame
+	var start_x: float = player.global_position.x
+	var joystick_center: Vector2 = joystick.get_global_rect().position + joystick.size / 2.0
+	joystick._update_knob(joystick_center + Vector2(joystick.joystick_radius, 0.0))
+	if not _check(player.joystick_vector.x > 0.9, "Joystick input must reach player"):
+		return
+	await physics_frame
+	await physics_frame
+	if not _check(player.global_position.x > start_x + 0.05, "Player must move from joystick input"):
+		return
+	joystick._reset()
+	if not _check(player.joystick_vector == Vector2.ZERO, "Joystick release must reset player input"):
 		return
 
 	player.wood_count = 10
