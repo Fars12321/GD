@@ -9,7 +9,7 @@ extends Node3D
 
 @onready var king: Player = $King
 @onready var camera_rig: CameraRig = $CameraRig
-@onready var joystick: VirtualJoystick = $UI/Joystick
+@onready var joystick: GameJoystick = $UI/Joystick
 
 ## الحدود المربعة لمنطقة التجول (نصف الضلع). الأرضية 160 وحدة.
 @export var world_half_extent: float = 78.0

@@ -1,4 +1,4 @@
-class_name VirtualJoystick
+class_name GameJoystick
 extends Control
 ## ============================================================
 ## عصا تحكم افتراضية (Virtual Joystick) لمس الشاشة — للهواتف.
