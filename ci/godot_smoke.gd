@@ -1,0 +1,19 @@
+extends SceneTree
+
+func _init() -> void:
+    assert(ProjectSettings.get_setting("application/config/name", "") == "Village Defense")
+    assert(ProjectSettings.get_setting("application/run/main_scene", "") == "res://scenes/Main.tscn")
+    for script_path in [
+        "res://scripts/main.gd",
+        "res://scripts/player.gd",
+        "res://scripts/camera_rig.gd",
+        "res://scripts/building_manager.gd",
+        "res://scripts/resource_node.gd",
+        "res://scripts/ui.gd",
+        "res://scripts/virtual_joystick.gd",
+        "res://scripts/buildings/wall.gd",
+        "res://scripts/buildings/tower.gd",
+    ]:
+        assert(load(script_path) != null, "Could not load " + script_path)
+    print("GODOT_SMOKE_PASS")
+    quit(0)
