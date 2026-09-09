@@ -162,11 +162,11 @@ func _update_validity() -> void:
 	if not is_placing:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node
-	var wood_cost := int(current_def.get("wood", 0))
-	var stone_cost := int(current_def.get("stone", 0))
-	var has_enough_resources := player != null and player.wood_count >= wood_cost and player.stone_count >= stone_cost
-	var overlapping := _check_overlap(snapped_position)
-	var new_valid := has_enough_resources and not overlapping
+	var wood_cost: int = int(current_def.get("wood", 0))
+	var stone_cost: int = int(current_def.get("stone", 0))
+	var has_enough_resources: bool = player != null and player.wood_count >= wood_cost and player.stone_count >= stone_cost
+	var overlapping: bool = _check_overlap(snapped_position)
+	var new_valid: bool = has_enough_resources and not overlapping
 	if new_valid != ghost_valid:
 		ghost_valid = new_valid
 		placement_validity_changed.emit(ghost_valid)
