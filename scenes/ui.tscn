@@ -1,118 +1,187 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui.gd" id="1_ui"]
+
+[sub_resource type="StyleBoxFlat" id="StyleTop"]
+bg_color = Color(0.055, 0.075, 0.105, 0.9)
+border_width_bottom = 2
+border_color = Color(0.75, 0.68, 0.45, 0.55)
+content_margin_left = 18.0
+content_margin_right = 18.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StylePanel"]
+bg_color = Color(0.07, 0.085, 0.11, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.64, 0.42, 0.7)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 22.0
+content_margin_top = 18.0
+content_margin_right = 22.0
+content_margin_bottom = 18.0
+
+[sub_resource type="StyleBoxFlat" id="StyleButton"]
+bg_color = Color(0.13, 0.16, 0.2, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.58, 0.48, 0.65)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 14.0
+content_margin_right = 14.0
 
 [node name="UI" type="CanvasLayer"]
 script = ExtResource("1_ui")
 
 [node name="TopPanel" type="PanelContainer" parent="."]
-anchor_right = 1.0
-offset_bottom = 64.0
-grow_horizontal = 2
+offset_right = 1280.0
+offset_bottom = 66.0
+theme_override_styles/panel = SubResource("StyleTop")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopPanel"]
-alignment = 1
+[node name="Margin" type="MarginContainer" parent="TopPanel"]
 
-[node name="WoodLabel" type="Label" parent="TopPanel/HBoxContainer"]
-theme_override_font_sizes/font_size = 26
-text = "خشب: 0"
+[node name="HBox" type="HBoxContainer" parent="TopPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 24
 
-[node name="Separator" type="VSeparator" parent="TopPanel/HBoxContainer"]
+[node name="Title" type="Label" parent="TopPanel/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.82, 0.62, 1)
+theme_override_font_sizes/font_size = 22
+text = "حصن المملكة"
 
-[node name="StoneLabel" type="Label" parent="TopPanel/HBoxContainer"]
-theme_override_font_sizes/font_size = 26
-text = "حجر: 0"
+[node name="DayLabel" type="Label" parent="TopPanel/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.84, 0.9, 1)
+theme_override_font_sizes/font_size = 20
+text = "اليوم 1"
+
+[node name="WoodLabel" type="Label" parent="TopPanel/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.84, 0.68, 0.42, 1)
+theme_override_font_sizes/font_size = 24
+text = "🪵  0"
+
+[node name="StoneLabel" type="Label" parent="TopPanel/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.78, 0.84, 1)
+theme_override_font_sizes/font_size = 24
+text = "🪨  0"
+
+[node name="TargetLabel" type="Label" parent="."]
+offset_left = 24.0
+offset_top = 82.0
+offset_right = 390.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 0.9)
+theme_override_font_sizes/font_size = 18
+text = "اقترب من شجرة أو صخرة"
 
 [node name="GatherButton" type="Button" parent="."]
 visible = false
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -190.0
-offset_top = -190.0
-offset_right = -40.0
-offset_bottom = -40.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_font_sizes/font_size = 30
+offset_left = 24.0
+offset_top = 132.0
+offset_right = 230.0
+offset_bottom = 198.0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleButton")
 text = "جمع"
 
 [node name="OpenBuildMenuButton" type="Button" parent="."]
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -190.0
-offset_top = -340.0
-offset_right = -40.0
-offset_bottom = -200.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_font_sizes/font_size = 26
+offset_left = 1050.0
+offset_top = 560.0
+offset_right = 1235.0
+offset_bottom = 660.0
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleButton")
 text = "بناء"
 
 [node name="BuildMenu" type="PanelContainer" parent="."]
 visible = false
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -170.0
-offset_right = 160.0
-offset_bottom = 170.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 430.0
+offset_top = 150.0
+offset_right = 850.0
+offset_bottom = 570.0
+theme_override_styles/panel = SubResource("StylePanel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="BuildMenu"]
-theme_override_constants/separation = 12
+[node name="Margin" type="MarginContainer" parent="BuildMenu"]
+layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="BuildMenu/VBoxContainer"]
-theme_override_font_sizes/font_size = 24
+[node name="VBox" type="VBoxContainer" parent="BuildMenu/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="BuildMenu/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.82, 0.62, 1)
+theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
-text = "اختر مبنى"
+text = "بناء الدفاعات"
 
-[node name="WallButton" type="Button" parent="BuildMenu/VBoxContainer"]
-custom_minimum_size = Vector2(0, 64)
+[node name="HintLabel" type="Label" parent="BuildMenu/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.74, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+text = "اختر دفاعًا ثم حرّك المعاينة"
+
+[node name="WallButton" type="Button" parent="BuildMenu/Margin/VBox"]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "سور\nخشب: 2   |   حجر: 1"
+theme_override_styles/normal = SubResource("StyleButton")
+text = "سور\n🪵 2   •   🪨 1"
 
-[node name="TowerButton" type="Button" parent="BuildMenu/VBoxContainer"]
-custom_minimum_size = Vector2(0, 64)
+[node name="TowerButton" type="Button" parent="BuildMenu/Margin/VBox"]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "برج\nخشب: 3   |   حجر: 6"
+theme_override_styles/normal = SubResource("StyleButton")
+text = "برج\n🪵 3   •   🪨 6"
 
-[node name="CloseMenuButton" type="Button" parent="BuildMenu/VBoxContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="CloseMenuButton" type="Button" parent="BuildMenu/Margin/VBox"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 text = "إغلاق"
+
+[node name="PlacementStatus" type="Label" parent="."]
+visible = false
+offset_left = 300.0
+offset_top = 610.0
+offset_right = 980.0
+offset_bottom = 660.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+text = "مكان صالح"
 
 [node name="ConfirmButton" type="Button" parent="."]
 visible = false
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -130.0
-offset_top = -130.0
-offset_right = -10.0
-offset_bottom = -50.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_font_sizes/font_size = 32
-text = "✓"
+offset_left = 430.0
+offset_top = 600.0
+offset_right = 610.0
+offset_bottom = 680.0
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleButton")
+text = "✓ تأكيد"
 
 [node name="CancelButton" type="Button" parent="."]
 visible = false
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -130.0
-offset_right = 130.0
-offset_bottom = -50.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_font_sizes/font_size = 32
-text = "✗"
+offset_left = 670.0
+offset_top = 600.0
+offset_right = 850.0
+offset_bottom = 680.0
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleButton")
+text = "✗ إلغاء"
