@@ -34,13 +34,11 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	phase_time += delta
-	if not is_night:
-		if phase_time >= day_duration:
-			_start_night()
-	else:
-		if phase_time >= night_duration:
-			_night_clear_requested = true
-			_try_finish_night()
+	if not is_night and phase_time >= day_duration:
+		_start_night()
+	elif is_night and phase_time >= night_duration:
+		_night_clear_requested = true
+		_try_finish_night()
 	_update_lighting()
 	time_changed.emit(maxf(0.0, (night_duration if is_night else day_duration) - phase_time), night_duration if is_night else day_duration, is_night)
 
@@ -67,30 +65,26 @@ func _start_night() -> void:
 func _try_finish_night() -> void:
 	if not is_night or phase_time < night_duration:
 		return
-	var enemies := get_tree().get_nodes_in_group("enemy")
-	if enemies.is_empty():
+	if get_tree().get_nodes_in_group("enemy").is_empty():
 		current_day += 1
 		_start_day()
 
-func _update_lighting(force: bool = false) -> void:
+func _update_lighting(_force: bool = false) -> void:
 	var total := night_duration if is_night else day_duration
 	var progress := clampf(phase_time / maxf(total, 0.001), 0.0, 1.0)
-	var blend := 0.0
+	var transition := clampf(transition_seconds / maxf(total, 0.001), 0.001, 0.49)
+	var night_blend := 0.0
 	if is_night:
-		blend = smoothstep(0.0, transition_seconds / total, progress)
-		if progress > 1.0 - transition_seconds / total:
-			blend = 1.0
+		night_blend = smoothstep(0.0, transition, progress)
 	else:
-		blend = 1.0 - smoothstep(0.0, transition_seconds / total, progress)
-	if not force and phase_time > transition_seconds and phase_time < total - transition_seconds:
-		blend = 1.0 if is_night else 0.0
+		night_blend = smoothstep(1.0 - transition, 1.0, progress)
 	if sun:
 		var night_rotation := Vector3(-18.0, 150.0, 0.0)
-		sun.rotation_degrees = _base_sun_rotation.lerp(night_rotation, blend)
-		sun.light_energy = lerpf(_base_sun_energy, 0.08, blend)
-		sun.light_color = _base_sun_color.lerp(Color(0.20, 0.28, 0.55, 1.0), blend)
+		sun.rotation_degrees = _base_sun_rotation.lerp(night_rotation, night_blend)
+		sun.light_energy = lerpf(_base_sun_energy, 0.08, night_blend)
+		sun.light_color = _base_sun_color.lerp(Color(0.20, 0.28, 0.55, 1.0), night_blend)
 	if world_environment and world_environment.environment:
 		var env := world_environment.environment
-		env.ambient_light_color = _day_ambient_color.lerp(_night_ambient_color, blend)
-		env.ambient_light_energy = lerpf(0.72, 0.12, blend)
-		env.background_color = _day_background.lerp(_night_background, blend)
+		env.ambient_light_color = _day_ambient_color.lerp(_night_ambient_color, night_blend)
+		env.ambient_light_energy = lerpf(0.72, 0.12, night_blend)
+		env.background_color = _day_background.lerp(_night_background, night_blend)
