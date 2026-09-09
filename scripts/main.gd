@@ -10,6 +10,7 @@ func _ready() -> void:
 		joystick.joystick_input.connect(_on_joystick_input)
 	_setup_castle_controller()
 	_setup_castle_hud()
+	_setup_gameplay_director()
 	_configure_world_presentation()
 
 func _on_joystick_input(vector: Vector2) -> void:
@@ -37,6 +38,17 @@ func _setup_castle_hud() -> void:
 	hud.name = "CastleHUD"
 	hud.set_script(script)
 	add_child(hud)
+
+func _setup_gameplay_director() -> void:
+	if get_node_or_null("GameplayDirector") != null:
+		return
+	var script := load("res://scripts/gameplay_director.gd") as Script
+	if script == null:
+		return
+	var director := Node3D.new()
+	director.name = "GameplayDirector"
+	director.set_script(script)
+	add_child(director)
 
 func _configure_world_presentation() -> void:
 	if world_environment == null or world_environment.environment == null:
