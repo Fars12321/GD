@@ -1,0 +1,29 @@
+name: Godot Smoke Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, godot-ci-phase3 ]
+
+jobs:
+  godot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.3
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Verify project is present
+        run: test -f project.godot && test -f scenes/Main.tscn
+
+      - name: Run headless smoke test
+        run: godot --headless --path . --script ci/godot_smoke.gd
+
+      - name: Import project in editor mode
+        run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
