@@ -1,9 +1,9 @@
 extends Node3D
-## Phase 4: escalating skeleton waves during the night.
+## مولد موجات Phase 4: موجات متزايدة تبدأ مع الليل.
 
 @export var enemy_scene: PackedScene = preload("res://scenes/enemy.tscn")
-@export var spawn_interval: float = 3.0
-@export var base_enemies: int = 3
+@export var spawn_interval: float = 2.8
+@export var base_enemies: int = 4
 @export var enemies_per_day: int = 2
 @export var map_radius: float = 17.0
 @export var reward_wood: int = 5
@@ -50,7 +50,7 @@ func _on_day_started(day: int) -> void:
 	if player == null:
 		player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("add_resources"):
-		player.add_resources(reward_wood, reward_stone)
+		player.add_resources(reward_wood + day - 1, reward_stone + day - 1)
 
 func _spawn_one() -> void:
 	if enemy_scene == null:
@@ -65,6 +65,10 @@ func _spawn_one() -> void:
 	_remaining_to_spawn -= 1
 
 func _get_spawn_position() -> Vector3:
+	var center := Vector3.ZERO
+	var castle := get_tree().get_first_node_in_group("castle_core") as Node3D
+	if castle:
+		center = castle.global_position
 	var angle := randf_range(0.0, TAU)
 	var radius := randf_range(map_radius - 2.0, map_radius)
-	return Vector3(cos(angle) * radius, 0.9, sin(angle) * radius)
+	return Vector3(center.x + cos(angle) * radius, 0.9, center.z + sin(angle) * radius)
