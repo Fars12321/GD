@@ -1,0 +1,55 @@
+name: Godot Phase 4 Day Night Enemy Combat
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ phase4-day-night-enemy-combat ]
+  pull_request:
+
+jobs:
+  godot-phase4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full asset repository
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.3
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Reconstruct project assets
+        run: bash ci/bootstrap_assets.sh
+
+      - name: Verify Phase 4 tree
+        run: |
+          test -f project.godot
+          test -f scenes/Main.tscn
+          test -f scenes/enemy.tscn
+          test -f scenes/projectile.tscn
+          test -f scripts/day_night_manager.gd
+          test -f scripts/enemy.gd
+          test -f scripts/wave_spawner.gd
+          test -f scripts/projectile.gd
+          test -f scripts/mobile_ui.gd
+          echo PHASE4_TREE_PASS
+
+      - name: Import project in editor mode
+        run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+
+      - name: Run Phase 4 smoke test
+        run: timeout 30s godot --headless --path . --script ci/godot_smoke_phase4.gd --quit-after 30
+
+      - name: Package Phase 4 review artifact
+        run: |
+          mkdir -p artifacts
+          zip -qr artifacts/VillageDefense_Phase4_DayNight_EnemyCombat_Review.zip project.godot scenes scripts assets README.md
+
+      - name: Upload Phase 4 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VillageDefense-Phase4-DayNight-EnemyCombat-Review
+          path: artifacts/
+          if-no-files-found: error
