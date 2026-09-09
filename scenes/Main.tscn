@@ -1,0 +1,70 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/camera_rig.gd" id="3_camera"]
+[ext_resource type="PackedScene" path="res://scenes/ui/TouchControls.tscn" id="4_touch"]
+[ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="5_ui"]
+[ext_resource type="PackedScene" path="res://scenes/resource_node.tscn" id="6_resnode"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/Tree_1_A_Color1.gltf" id="7_tree1"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/Tree_2_A_Color1.gltf" id="8_tree2"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/Rock_1_A_Color1.gltf" id="9_rock1"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/Rock_2_A_Color1.gltf" id="10_rock2"]
+[ext_resource type="PackedScene" path="res://scenes/BuildingManager.tscn" id="11_buildmgr"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(40, 1, 40)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(40, 40)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("PlaneMesh_ground")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 8, 0)
+shadow_enabled = false
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 8)
+current = true
+script = ExtResource("3_camera")
+target_path = NodePath("../Player")
+
+[node name="TouchControls" parent="." instance=ExtResource("4_touch")]
+
+[node name="UI" parent="." instance=ExtResource("5_ui")]
+
+[node name="BuildingManager" parent="." instance=ExtResource("11_buildmgr")]
+
+[node name="Tree_01" parent="." instance=ExtResource("6_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -4)
+model_override = ExtResource("7_tree1")
+
+[node name="Tree_02" parent="." instance=ExtResource("6_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -1)
+model_override = ExtResource("8_tree2")
+
+[node name="Rock_01" parent="." instance=ExtResource("6_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -3)
+resource_type = 1
+total_amount = 8
+model_override = ExtResource("9_rock1")
+
+[node name="Rock_02" parent="." instance=ExtResource("6_resnode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 2)
+resource_type = 1
+total_amount = 8
+model_override = ExtResource("10_rock2")
