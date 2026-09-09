@@ -1,4 +1,4 @@
-name: Godot Smoke Test
+name: Godot Phase 3 Runner
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
   godot:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout full asset repository
         uses: actions/checkout@v4
 
       - name: Install Godot 4.3
@@ -19,11 +19,40 @@ jobs:
           use-dotnet: false
           include-templates: false
 
-      - name: Verify project is present
-        run: test -f project.godot && test -f scenes/Main.tscn
+      - name: Reconstruct complete Godot project assets
+        run: bash ci/bootstrap_assets.sh
+
+      - name: Verify complete project tree
+        run: |
+          test -f project.godot
+          test -f scenes/Main.tscn
+          test -f scripts/building_manager.gd
+          test -f assets/models/castle-kit/wall.glb
+          test -f assets/models/castle-kit/tower-square-base.glb
+          test -f assets/models/nature/Tree_1_A_Color1.gltf
+          test -f assets/models/nature/Tree_1_A_Color1.bin
+          test -f assets/audio/ui/switch1.ogg
+          echo RUNNER_PROJECT_READY
 
       - name: Run headless smoke test
         run: godot --headless --path . --script ci/godot_smoke.gd
 
       - name: Import project in editor mode
         run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+
+      - name: Render Phase 3 screenshot
+        run: |
+          mkdir -p artifacts
+          godot --headless --rendering-method gl_compatibility --path . --script ci/phase3_screenshot.gd
+
+      - name: Package reconstructed runner project
+        run: |
+          zip -qr artifacts/VillageDefense_Phase3_RunnerReady.zip \
+            project.godot README_Godot_Project.md scenes scripts assets
+
+      - name: Upload runner artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VillageDefense-Phase3-RunnerReady
+          path: artifacts/
+          if-no-files-found: error
