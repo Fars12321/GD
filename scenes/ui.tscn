@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/mobile_ui.gd" id="1_ui"]
 
 [sub_resource type="StyleBoxFlat" id="StyleTop"]
 bg_color = Color(0.055, 0.075, 0.105, 0.9)
@@ -134,21 +134,21 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.74, 0.8, 1)
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
-text = "اختر دفاعًا ثم حرّك المعاينة"
+text = "اختر دفاعًا ثم حرّك المعاينة على الشبكة"
 
 [node name="WallButton" type="Button" parent="BuildMenu/Margin/VBox"]
 custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleButton")
-text = "سور\n🪵 2   •   🪨 1"
+text = "سور\n🪵 10 خشب"
 
 [node name="TowerButton" type="Button" parent="BuildMenu/Margin/VBox"]
 custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleButton")
-text = "برج\n🪵 3   •   🪨 6"
+text = "برج دفاعي\n🪨 10 حجر"
 
 [node name="CloseMenuButton" type="Button" parent="BuildMenu/Margin/VBox"]
 custom_minimum_size = Vector2(0, 52)
@@ -164,7 +164,7 @@ offset_right = 980.0
 offset_bottom = 660.0
 theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
-text = "مكان صالح"
+text = "معاينة البناء"
 
 [node name="ConfirmButton" type="Button" parent="."]
 visible = false
