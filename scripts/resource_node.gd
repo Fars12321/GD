@@ -16,6 +16,7 @@ signal resource_collected(type: ResourceType, amount: int)
 signal depleted
 var _remaining: int
 var _bodies_in_range: Array = []
+var _visual_root: Node3D
 
 func _ready() -> void:
 	_remaining = total_amount
@@ -24,9 +25,11 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	if model_override:
-		var visual := model_override.instantiate()
-		add_child(visual)
+		_visual_root = model_override.instantiate()
+		add_child(_visual_root)
 		mesh_instance.visible = false
+	else:
+		_visual_root = mesh_instance
 	if gather_sound.stream == null:
 		match resource_type:
 			ResourceType.WOOD:
@@ -58,15 +61,23 @@ func gather() -> bool:
 		_play_depletion_and_free()
 	return true
 
+func get_resource_name() -> String:
+	return "خشب" if resource_type == ResourceType.WOOD else "حجر"
+
+func get_remaining_amount() -> int:
+	return _remaining
+
 func _play_gather_sound() -> void:
 	if gather_sound.stream:
 		gather_sound.play()
 
 func _play_shake_effect() -> void:
-	var original_scale: Vector3 = mesh_instance.scale
+	if _visual_root == null:
+		return
+	var original_scale: Vector3 = _visual_root.scale
 	var tween := create_tween()
-	tween.tween_property(mesh_instance, "scale", original_scale * 1.15, 0.08)
-	tween.tween_property(mesh_instance, "scale", original_scale, 0.08)
+	tween.tween_property(_visual_root, "scale", original_scale * 1.08, 0.06)
+	tween.tween_property(_visual_root, "scale", original_scale, 0.10)
 
 func _play_depletion_and_free() -> void:
 	set_deferred("monitoring", false)
@@ -75,6 +86,9 @@ func _play_depletion_and_free() -> void:
 		if is_instance_valid(body) and body.has_method("unregister_nearby_resource"):
 			body.unregister_nearby_resource(self)
 	_bodies_in_range.clear()
-	var tween := create_tween()
-	tween.tween_property(mesh_instance, "scale", Vector3.ZERO, 0.35)
-	tween.tween_callback(queue_free)
+	if _visual_root:
+		var tween := create_tween()
+		tween.tween_property(_visual_root, "scale", Vector3.ZERO, 0.35)
+		tween.tween_callback(queue_free)
+	else:
+		queue_free()
