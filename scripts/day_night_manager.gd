@@ -26,6 +26,7 @@ var _day_background: Color = Color(0.075, 0.11, 0.17, 1.0)
 var _night_background: Color = Color(0.008, 0.015, 0.045, 1.0)
 
 func _ready() -> void:
+	add_to_group("day_night_manager")
 	if sun:
 		_base_sun_rotation = sun.rotation_degrees
 		_base_sun_energy = sun.light_energy
