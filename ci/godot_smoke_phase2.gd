@@ -22,6 +22,7 @@ func _init() -> void:
 	assert(player.wood_count == 1, "Gathering tree must add one wood")
 	assert(tree.get_remaining_amount() == 4, "Tree must lose one unit")
 
+	player.unregister_nearby_resource(tree)
 	player.register_nearby_resource(rock)
 	player.gather_nearest()
 	assert(player.stone_count == 1, "Gathering rock must add one stone")
