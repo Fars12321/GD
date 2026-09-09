@@ -13,13 +13,17 @@ size = Vector3(0.6, 1.2, 0.6)
 albedo_color = Color(0.45, 0.32, 0.18, 1)
 
 [node name="ResourceNode" type="Area3D"]
+collision_layer = 2
+collision_mask = 1
+monitoring = true
+monitorable = true
 script = ExtResource("1_resource")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CylinderShape3D_trigger")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+position = Vector3(0, 0.6, 0)
 mesh = SubResource("BoxMesh_placeholder")
 surface_material_override/0 = SubResource("StandardMaterial3D_placeholder")
 

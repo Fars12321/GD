@@ -1,0 +1,54 @@
+name: Godot Phase 2 Resource Gathering
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ phase2-resource-gathering-review ]
+  pull_request:
+
+jobs:
+  godot-phase2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full asset repository
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.3
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Reconstruct project assets
+        run: bash ci/bootstrap_assets.sh
+
+      - name: Verify Phase 2 tree
+        run: |
+          test -f project.godot
+          test -f scenes/Main.tscn
+          test -f scenes/resource_node.tscn
+          test -f scripts/resource_node.gd
+          test -f scripts/player.gd
+          test -f scripts/mobile_ui.gd
+          ! test -f scripts/building_manager.gd
+          ! test -d scenes/buildings
+          echo PHASE2_TREE_PASS
+
+      - name: Run Phase 2 smoke test
+        run: godot --headless --path . --script ci/godot_smoke_phase2.gd
+
+      - name: Import project in editor mode
+        run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+
+      - name: Package Phase 2 review artifact
+        run: |
+          mkdir -p artifacts
+          zip -qr artifacts/VillageDefense_Phase2_ResourceGathering_Review.zip project.godot scenes scripts assets README.md
+
+      - name: Upload Phase 2 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VillageDefense-Phase2-ResourceGathering-Review
+          path: artifacts/
+          if-no-files-found: error

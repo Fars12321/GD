@@ -1,8 +1,9 @@
 extends Area3D
 class_name ResourceNode
-## مورد قابل الجمع: شجرة خشب أو صخرة حجر.
+## Phase 2 resource node: wood or stone with interaction range, audio and feedback.
 
 enum ResourceType { WOOD, STONE }
+
 @export var resource_type: ResourceType = ResourceType.WOOD
 @export var total_amount: int = 5
 @export var amount_per_gather: int = 1
@@ -14,22 +15,25 @@ enum ResourceType { WOOD, STONE }
 
 signal resource_collected(type: ResourceType, amount: int)
 signal depleted
+
 var _remaining: int
-var _bodies_in_range: Array = []
+var _bodies_in_range: Array[Node] = []
 var _visual_root: Node3D
 
 func _ready() -> void:
-	_remaining = total_amount
+	_remaining = maxi(total_amount, 0)
 	monitoring = true
 	monitorable = true
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+
 	if model_override:
 		_visual_root = model_override.instantiate()
 		add_child(_visual_root)
 		mesh_instance.visible = false
 	else:
 		_visual_root = mesh_instance
+
 	if gather_sound.stream == null:
 		match resource_type:
 			ResourceType.WOOD:
@@ -51,10 +55,11 @@ func _on_body_exited(body: Node) -> void:
 func gather() -> bool:
 	if _remaining <= 0:
 		return false
-	var amount_taken: int = min(amount_per_gather, _remaining)
+	var amount_taken := mini(amount_per_gather, _remaining)
 	_remaining -= amount_taken
 	resource_collected.emit(resource_type, amount_taken)
-	_play_gather_sound()
+	if gather_sound.stream:
+		gather_sound.play()
 	_play_shake_effect()
 	if _remaining <= 0:
 		depleted.emit()
@@ -67,14 +72,10 @@ func get_resource_name() -> String:
 func get_remaining_amount() -> int:
 	return _remaining
 
-func _play_gather_sound() -> void:
-	if gather_sound.stream:
-		gather_sound.play()
-
 func _play_shake_effect() -> void:
 	if _visual_root == null:
 		return
-	var original_scale: Vector3 = _visual_root.scale
+	var original_scale := _visual_root.scale
 	var tween := create_tween()
 	tween.tween_property(_visual_root, "scale", original_scale * 1.08, 0.06)
 	tween.tween_property(_visual_root, "scale", original_scale, 0.10)
