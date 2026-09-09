@@ -9,6 +9,7 @@ func _ready() -> void:
 	if not joystick.joystick_input.is_connected(_on_joystick_input):
 		joystick.joystick_input.connect(_on_joystick_input)
 	_setup_castle_controller()
+	_setup_castle_hud()
 	_configure_world_presentation()
 
 func _on_joystick_input(vector: Vector2) -> void:
@@ -25,6 +26,17 @@ func _setup_castle_controller() -> void:
 	controller.name = "CastleController"
 	controller.set_script(script)
 	castle.add_child(controller)
+
+func _setup_castle_hud() -> void:
+	if get_node_or_null("CastleHUD") != null:
+		return
+	var script := load("res://scripts/castle_hud.gd") as Script
+	if script == null:
+		return
+	var hud := CanvasLayer.new()
+	hud.name = "CastleHUD"
+	hud.set_script(script)
+	add_child(hud)
 
 func _configure_world_presentation() -> void:
 	if world_environment == null or world_environment.environment == null:
