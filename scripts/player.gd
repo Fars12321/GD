@@ -86,8 +86,8 @@ func spend_resources(wood_cost: int, stone_cost: int) -> bool:
 
 func _on_resource_collected(type: int, amount: int) -> void:
 	match type:
-		ResourceNode.ResourceType.WOOD:
+		0:
 			wood_count += amount
-		ResourceNode.ResourceType.STONE:
+		1:
 			stone_count += amount
 	resources_changed.emit(wood_count, stone_count)
