@@ -1,0 +1,70 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/camera_rig.gd" id="2_camera"]
+[ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="4_player"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.25, 0.47, 0.75, 1)
+sky_horizon_color = Color(0.64, 0.8, 0.88, 1)
+ground_bottom_color = Color(0.3, 0.32, 0.34, 1)
+
+[sub_resource type="Sky" id="Sky_scene"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_scene"]
+background_mode = 2
+sky = SubResource("Sky_scene")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.36, 0.52, 0.28, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(160, 0.6, 160)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(160, 0.6, 160)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_scene")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="Sun" type="DirectionalLight3D" parent="World"]
+light_energy = 1.15
+shadow_enabled = true
+directional_shadow_max_distance = 120.0
+
+[node name="Ground" type="StaticBody3D" parent="World"]
+collision_layer = 1
+collision_mask = 1
+
+[node name="Collision" type="CollisionShape3D" parent="World/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Mesh" type="MeshInstance3D" parent="World/Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+mesh = SubResource("BoxMesh_ground")
+surface_material_override/0 = SubResource("StandardMaterial3D_ground")
+
+[node name="CameraRig" type="Node3D" parent="."]
+script = ExtResource("2_camera")
+target_path = NodePath("../King")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+current = true
+near = 0.3
+far = 250.0
+fov = 60.0
+
+[node name="King" parent="." instance=ExtResource("4_player")]
+
+[node name="UI" parent="." instance=ExtResource("3_ui")]

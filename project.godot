@@ -1,0 +1,36 @@
+; Engine configuration file.
+; ============================================================
+; لعبة استراتيجية وبناء قرية 3D للهواتف الذكية — Godot 4
+; Phase 1: نظام تحكم الملك والكاميرا
+; المحرّك: GL Compatibility (OpenGL ES 3.0) لدعم الهواتف
+; ============================================================
+config_version=5
+
+[application]
+
+config/name="GD Kingdom - Village Strategy 3D"
+config/version="0.1.0"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[autoload]
+
+InputSetup="*res://scripts/input_setup.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/handheld/orientation=4
+window/energy_saving/keep_screen_on=true
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+pointing/emulate_mouse_from_touch=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+scaling_3d/scale=0.75
