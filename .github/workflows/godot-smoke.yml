@@ -59,14 +59,32 @@ jobs:
       - name: Static project check
         run: python3 ci/static_check.py
 
+      - name: Import project in editor mode
+        run: timeout 60s godot --headless --editor --path . --quit || test $? -eq 124
+
       - name: Run headless smoke test
-        run: godot --headless --path . --script ci/godot_smoke.gd
+        run: |
+          set +e
+          timeout 60s godot --headless --path . --script ci/godot_smoke.gd > smoke.log 2>&1
+          code=$?
+          cat smoke.log
+          if [ "$code" -ne 0 ]; then
+            msg=$(tail -n 60 smoke.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/$/%0A/' | tr -d '\n')
+            echo "::error title=godot_smoke::${msg}"
+          fi
+          exit $code
 
       - name: Run headless roguelite smoke test
-        run: timeout 60s godot --headless --path . --script ci/godot_smoke_roguelite.gd
-
-      - name: Import project in editor mode
-        run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+        run: |
+          set +e
+          timeout 60s godot --headless --path . --script ci/godot_smoke_roguelite.gd > roguelite.log 2>&1
+          code=$?
+          cat roguelite.log
+          if [ "$code" -ne 0 ]; then
+            msg=$(tail -n 60 roguelite.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/$/%0A/' | tr -d '\n')
+            echo "::error title=roguelite_smoke::${msg}"
+          fi
+          exit $code
 
       - name: Render Phase 3 screenshot under Xvfb
         run: |
