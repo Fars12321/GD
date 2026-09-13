@@ -1,0 +1,149 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrade_overlay.gd" id="1_overlay"]
+
+[sub_resource type="StyleBoxFlat" id="CardStyle"]
+bg_color = Color(0.09, 0.11, 0.15, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.78, 0.68, 0.42, 0.9)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_right_bottom = 16
+corner_radius_bottom_left = 16
+content_margin_left = 18.0
+content_margin_top = 18.0
+content_margin_right = 18.0
+content_margin_bottom = 18.0
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.06, 0.075, 0.1, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.32, 0.28, 0.9)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_right_bottom = 18
+corner_radius_bottom_left = 18
+content_margin_left = 30.0
+content_margin_top = 26.0
+content_margin_right = 30.0
+content_margin_bottom = 26.0
+
+[node name="UpgradeOverlay" type="CanvasLayer"]
+layer = 20
+process_mode = 3
+visible = false
+script = ExtResource("1_overlay")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.015, 0.02, 0.045, 0.8)
+mouse_filter = 0
+
+[node name="Cards" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Cards"]
+offset_left = 140.0
+offset_top = 62.0
+offset_right = 1140.0
+offset_bottom = 122.0
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.93, 0.85, 0.62, 1)
+theme_override_font_sizes/font_size = 40
+text = "صمدت حتى الليلة 1"
+
+[node name="Subtitle" type="Label" parent="Cards"]
+offset_left = 140.0
+offset_top = 128.0
+offset_right = 1140.0
+offset_bottom = 168.0
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.79, 0.86, 1)
+theme_override_font_sizes/font_size = 20
+text = "اختر ترقية واحدة قبل الفجر"
+
+[node name="CardsRow" type="HBoxContainer" parent="Cards"]
+offset_left = 110.0
+offset_top = 200.0
+offset_right = 1170.0
+offset_bottom = 580.0
+theme_override_constants/separation = 26
+alignment = 1
+
+[node name="Card0" type="Button" parent="Cards/CardsRow"]
+custom_minimum_size = Vector2(320, 330)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("CardStyle")
+autowrap_mode = 3
+text = "بطاقة"
+
+[node name="Card1" type="Button" parent="Cards/CardsRow"]
+custom_minimum_size = Vector2(320, 330)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("CardStyle")
+autowrap_mode = 3
+text = "بطاقة"
+
+[node name="Card2" type="Button" parent="Cards/CardsRow"]
+custom_minimum_size = Vector2(320, 330)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("CardStyle")
+autowrap_mode = 3
+text = "بطاقة"
+
+[node name="GameOver" type="Control" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="GameOver"]
+offset_left = 340.0
+offset_top = 190.0
+offset_right = 940.0
+offset_bottom = 520.0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="GameOverTitle" type="Label" parent="GameOver"]
+offset_left = 340.0
+offset_top = 230.0
+offset_right = 940.0
+offset_bottom = 300.0
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.62, 0.5, 1)
+theme_override_font_sizes/font_size = 44
+text = "سقطت المملكة"
+
+[node name="GameOverText" type="Label" parent="GameOver"]
+offset_left = 340.0
+offset_top = 310.0
+offset_right = 940.0
+offset_bottom = 420.0
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.86, 0.88, 0.93, 1)
+theme_override_font_sizes/font_size = 22
+text = "صمدت ليلة واحدة"
+
+[node name="RestartButton" type="Button" parent="GameOver"]
+offset_left = 500.0
+offset_top = 440.0
+offset_right = 780.0
+offset_bottom = 510.0
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("CardStyle")
+text = "جولة جديدة"

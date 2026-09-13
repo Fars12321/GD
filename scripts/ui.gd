@@ -1,8 +1,9 @@
 extends CanvasLayer
-## واجهة Phase 3: موارد، حالة الهدف، البناء، وتغذية راجعة واضحة للموبايل.
+## واجهة «ليلة واحدة»: موارد، صحة الملك والقلعة، حالة الهدف، البناء، والهجوم.
 
 @onready var wood_label: Label = $TopPanel/Margin/HBox/WoodLabel
 @onready var stone_label: Label = $TopPanel/Margin/HBox/StoneLabel
+@onready var day_label: Label = $TopPanel/Margin/HBox/DayLabel
 @onready var gather_button: Button = $GatherButton
 @onready var target_label: Label = $TargetLabel
 @onready var open_build_menu_button: Button = $OpenBuildMenuButton
@@ -13,15 +14,25 @@ extends CanvasLayer
 @onready var confirm_button: Button = $ConfirmButton
 @onready var cancel_button: Button = $CancelButton
 @onready var placement_status: Label = $PlacementStatus
+@onready var attack_button: Button = $AttackButton
+@onready var castle_health_bar: ProgressBar = $CastleHealthBar
+@onready var player_health_bar: ProgressBar = $PlayerHealthBar
 
 var player: Node = null
 var building_manager: Node = null
+var castle_core: Node = null
 var current_target: Node = null
 
 func _ready() -> void:
+	add_to_group("hud")
 	gather_button.visible = false
 	placement_status.visible = false
+	attack_button.visible = false
 	target_label.text = "اقترب من شجرة أو صخرة"
+	castle_health_bar.max_value = 1.0
+	castle_health_bar.value = 1.0
+	player_health_bar.max_value = 1.0
+	player_health_bar.value = 1.0
 	gather_button.pressed.connect(_on_gather_button_pressed)
 	open_build_menu_button.pressed.connect(_on_open_build_menu_pressed)
 	close_menu_button.pressed.connect(_on_close_menu_pressed)
@@ -29,8 +40,10 @@ func _ready() -> void:
 	tower_button.pressed.connect(_on_tower_button_pressed)
 	confirm_button.pressed.connect(_on_confirm_button_pressed)
 	cancel_button.pressed.connect(_on_cancel_button_pressed)
+	attack_button.pressed.connect(_on_attack_button_pressed)
 	call_deferred("_connect_to_player")
 	call_deferred("_connect_to_building_manager")
+	call_deferred("_connect_to_castle_core")
 
 func _connect_to_player() -> void:
 	player = get_tree().get_first_node_in_group("player")
@@ -39,6 +52,8 @@ func _connect_to_player() -> void:
 		return
 	player.resources_changed.connect(_on_resources_changed)
 	player.gather_target_changed.connect(_on_gather_target_changed)
+	if player.has_signal("health_changed"):
+		player.health_changed.connect(_on_player_health_changed)
 	_on_resources_changed(player.wood_count, player.stone_count)
 
 func _connect_to_building_manager() -> void:
@@ -49,6 +64,42 @@ func _connect_to_building_manager() -> void:
 	building_manager.placement_started.connect(_on_placement_started)
 	building_manager.placement_ended.connect(_on_placement_ended)
 	building_manager.placement_validity_changed.connect(_on_placement_validity_changed)
+
+func _connect_to_castle_core() -> void:
+	castle_core = get_tree().get_first_node_in_group("castle_core")
+	if castle_core == null:
+		return
+	if castle_core.has_signal("health_changed"):
+		castle_core.health_changed.connect(_on_castle_health_changed)
+	_on_castle_health_changed(int(castle_core.current_health), int(castle_core.max_health))
+
+# --- واجهة عامة يستدعيها roguelite_director ---
+
+func set_phase_label(text: String) -> void:
+	day_label.text = text
+
+func set_attack_enabled(enabled: bool) -> void:
+	attack_button.visible = enabled
+
+func set_castle_health(current: int, maximum: int) -> void:
+	_on_castle_health_changed(current, maximum)
+
+func set_player_health(current: int, maximum: int) -> void:
+	_on_player_health_changed(current, maximum)
+
+func _on_castle_health_changed(current: int, maximum: int) -> void:
+	var ratio: float = float(current) / float(maxi(1, maximum))
+	castle_health_bar.max_value = 1.0
+	castle_health_bar.value = clampf(ratio, 0.0, 1.0)
+
+func _on_player_health_changed(current: int, maximum: int) -> void:
+	var ratio: float = float(current) / float(maxi(1, maximum))
+	player_health_bar.max_value = 1.0
+	player_health_bar.value = clampf(ratio, 0.0, 1.0)
+
+func _on_attack_button_pressed() -> void:
+	if player != null and player.has_method("attack_nearest"):
+		player.attack_nearest()
 
 func _on_resources_changed(wood: int, stone: int) -> void:
 	wood_label.text = "🪵  %d" % wood

@@ -4,9 +4,21 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [ main, godot-ci-phase3 ]
+    branches: [ main, godot-ci-phase3, arena/01a09b88-gd ]
 
 jobs:
+  static:
+    name: Static project check (no Godot needed)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct project assets
+        run: bash ci/bootstrap_assets.sh
+
+      - name: Verify scenes, node paths, resources and groups
+        run: python3 ci/static_check.py
+
   godot:
     runs-on: ubuntu-latest
     steps:
@@ -28,16 +40,30 @@ jobs:
           test -f project.godot
           test -f scenes/Main.tscn
           test -f scripts/building_manager.gd
+          test -f scripts/roguelite_director.gd
+          test -f scripts/day_night_manager.gd
+          test -f scripts/wave_spawner.gd
+          test -f scripts/castle_core.gd
+          test -f scripts/enemy.gd
+          test -f scenes/enemy.tscn
+          test -f scenes/ui/UpgradeOverlay.tscn
           test -f assets/models/castle-kit/wall.glb
           test -f assets/models/castle-kit/tower-square-base.glb
           test -f assets/models/castle-kit/Textures/colormap.png
           test -f assets/models/nature/Tree_1_A_Color1.gltf
           test -f assets/models/nature/Tree_1_A_Color1.bin
           test -f assets/audio/ui/switch1.ogg
+          test -f assets/characters/Skeleton_Warrior.glb
           echo RUNNER_PROJECT_READY
+
+      - name: Static project check
+        run: python3 ci/static_check.py
 
       - name: Run headless smoke test
         run: godot --headless --path . --script ci/godot_smoke.gd
+
+      - name: Run headless roguelite smoke test
+        run: timeout 60s godot --headless --path . --script ci/godot_smoke_roguelite.gd
 
       - name: Import project in editor mode
         run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
@@ -50,6 +76,7 @@ jobs:
 
       - name: Package reconstructed runner project
         run: |
+          mkdir -p artifacts
           zip -qr artifacts/VillageDefense_Phase3_RunnerReady.zip \
             project.godot scenes scripts assets
 
