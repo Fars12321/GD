@@ -32,6 +32,16 @@ jobs:
           use-dotnet: false
           include-templates: false
 
+      - name: Verify the installed Godot version
+        run: |
+          version=$(godot --version | head -n 1)
+          echo "Installed: $version"
+          echo "::notice title=godot_version::${version}"
+          case "$version" in
+            4.7.2*) echo "Godot version OK" ;;
+            *) echo "::error title=godot_version::expected 4.7.2 but got ${version}"; exit 1 ;;
+          esac
+
       - name: Reconstruct complete Godot project assets
         run: bash ci/bootstrap_assets.sh
 
