@@ -46,6 +46,9 @@ func _init() -> void:
 		return
 	_main = main_scene.instantiate()
 	root.add_child(_main)
+	# _init() يعمل قبل تهيئة SceneTree، لذا _ready() (وبالتالي add_to_group)
+	# لم يُنفَّذ بعد. ننتظر إطارات حتى تُسجَّل المجموعات — وإلا بدت كلها فارغة.
+	await _settle(3)
 	_director = get_first_node_in_group("roguelite_director")
 	_day_night = get_first_node_in_group("day_night_manager")
 	_core = get_first_node_in_group("castle_core")

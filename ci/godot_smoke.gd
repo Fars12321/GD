@@ -55,6 +55,12 @@ func _init() -> void:
 		return
 	root.add_child(main)
 	await process_frame
+	await process_frame
 	for node_name in ["Player", "BuildingManager", "RogueliteDirector", "DayNightManager", "WaveSpawner", "UpgradeOverlay", "CastleCore", "NavigationRegion3D"]:
 		_check(main.get_node_or_null(node_name) != null, node_name + " missing in Main.tscn")
+	# حارس انحدار: لو فشل سكربت في الترجمة تبقى العقدة بلا سكربت (هكذا انكشف ui.gd).
+	var ui_node: CanvasLayer = main.get_node_or_null("UI") as CanvasLayer
+	_check(ui_node != null and ui_node.get_script() != null, "UI has no script attached (scripts/ui.gd failed to compile?)")
+	var player_node: Node = main.get_node_or_null("Player")
+	_check(player_node != null and player_node.get_script() != null, "Player has no script attached (scripts/player.gd failed to compile?)")
 	_finish("GODOT_SMOKE")
