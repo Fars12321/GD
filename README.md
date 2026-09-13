@@ -1,6 +1,6 @@
 # Village Defense — «ليلة واحدة»
 
-لعبة دفاع **roguelite** للهاتف مبنية بمحرّك **Godot 4.3** (المُصيِّر `gl_compatibility` ليعمل على أوسع مدى من الأجهزة).
+لعبة دفاع **roguelite** للهاتف مبنية بمحرّك **Godot 4.7.2** (المُصيِّر `gl_compatibility` ليعمل على أوسع مدى من الأجهزة).
 
 ## حلقة اللعب
 
@@ -26,7 +26,7 @@ python ci/bootstrap_assets.py
 bash ci/bootstrap_assets.sh
 ```
 
-بعدها افتح `project.godot` في Godot 4.3 وشغّل `scenes/Main.tscn`.
+بعدها افتح `project.godot` في Godot 4.7.2 وشغّل `scenes/Main.tscn`.
 بدون هذه الخطوة سيفشل تحميل `scenes/buildings/Wall.tscn` و`Tower.tscn` (تعتمد على `assets/models/castle-kit/*.glb`).
 
 ## الفحص
@@ -42,7 +42,7 @@ python ci/check_all.py
 GODOT_BIN=/path/to/godot python ci/check_all.py
 
 # ويندوز (PowerShell)
-$env:GODOT_BIN="C:\godot\Godot_v4.3-stable_win64.exe"; python ci/check_all.py
+$env:GODOT_BIN="C:\godot\Godot_v4.7.2-stable_win64.exe"; python ci/check_all.py
 ```
 
 **أو عبر bash:** `bash ci/check_all.sh`
@@ -55,7 +55,7 @@ $env:GODOT_BIN="C:\godot\Godot_v4.3-stable_win64.exe"; python ci/check_all.py
 | `ci/godot_smoke.gd` | تحميل كل السكربتات + توليد `Main.tscn` والتحقق من العُقد الأساسية | ✅ نعم |
 | `ci/godot_smoke_roguelite.gd` | الدورة ليل/نهار، تولّد الموجات، مكافأة القتل، سحب 3 بطاقات فريدة، الإيقاف المؤقت أثناء الاختيار، تطبيق الترقية، تقدّم اليوم، صحة القلعة، وحالة الهزيمة | ✅ نعم |
 
-**تنزيل Godot 4.3:** من <https://godotengine.org/download/archive/4.3-stable/> — النسخة العادية (ليست `.NET`). الملف التنفيذي واحد لا يحتاج تثبيتًا؛ ضعه في مجلد ومرّر مساره عبر `GODOT_BIN`.
+**تنزيل Godot 4.7.2:** من <https://godotengine.org/download/archive/4.7.2-stable/> — النسخة العادية (ليست `.NET`). الملف التنفيذي واحد لا يحتاج تثبيتًا؛ ضعه في مجلد ومرّر مساره عبر `GODOT_BIN`.
 
 ## التحكم
 

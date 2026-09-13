@@ -327,7 +327,7 @@ def check_scripts() -> None:
                 # قد تكون إشارة على عقدة أخرى — تحذير فقط
                 warn(f"{rel}: {name}.emit( ...) — \"{name}\" not declared in this file")
         # 6) `var x := <ternary>` — المحرّك يعطي Parse Error لأن الطرفَين Variant.
-        #    هذا هو العطل الذي أسقط ui.gd في CI (Godot 4.3: "Cannot infer the type…").
+        #    هذا هو العطل الذي أسقط ui.gd في CI («Cannot infer the type…» — ظهر أولًا على 4.3 ويبقى خطأً حتى 4.7).
         for number, line in enumerate(strip_noise(text).splitlines(), 1):
             if re.match(r"\s*var \w+\s*:=.*\bif\b.*\belse\b", line):
                 err(f"{rel}:{number}: `var x := ... if ... else ...` cannot infer a type — declare it explicitly")

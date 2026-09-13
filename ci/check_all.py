@@ -8,7 +8,7 @@
 الاستخدام:
   python ci/check_all.py
   GODOT_BIN=/path/to/godot python ci/check_all.py        (لينكس/ماك)
-  set GODOT_BIN=C:\\godot\\Godot_v4.3-stable_win64.exe    (ويندوز)
+  set GODOT_BIN=C:\\godot\\Godot_v4.7.2-stable_win64.exe    (ويندوز)
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GODOT_CANDIDATES = ["godot", "godot4", "godot-headless", "Godot_v4.3-stable_win64.exe"]
+GODOT_CANDIDATES = ["godot", "godot4", "godot-headless", "Godot_v4.7.2-stable_win64.exe"]
 
 
 def step(title: str) -> None:
@@ -65,7 +65,7 @@ def main() -> int:
     godot = find_godot()
     if godot is None:
         print("GODOT_SKIPPED: لم يُعثر على محرّك Godot.")
-        print("  نزّل Godot 4.3 من https://godotengine.org/download/archive/4.3-stable/")
+        print("  نزّل Godot 4.7.2 من https://godotengine.org/download/archive/4.7.2-stable/")
         print("  ثم حدّد GODOT_BIN وأعد التشغيل.")
         print("CHECK_ALL_PASS_STATIC_ONLY")
         return 0

@@ -1,4 +1,4 @@
-name: Godot Phase 3 Runner
+name: Godot CI
 
 on:
   workflow_dispatch:
@@ -25,10 +25,10 @@ jobs:
       - name: Checkout full asset repository
         uses: actions/checkout@v4
 
-      - name: Install Godot 4.3
+      - name: Install Godot 4.7.2
         uses: chickensoft-games/setup-godot@v2
         with:
-          version: 4.3.0
+          version: 4.7.2
           use-dotnet: false
           include-templates: false
 
