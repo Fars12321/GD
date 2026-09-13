@@ -113,7 +113,12 @@ func _init() -> void:
 	_director.choose_upgrade("mason")
 	_check(int(_core.max_health) > health_before, "mason should raise the castle max health")
 
-	# 6) الضرر على القلعة ثم حالة الهزيمة.
+	# 6) الفيزياء: الملك يسقط ويستقر على الأرض.
+	#    مهمّ لأن Godot 4.6+ جعل Jolt محرّك الفيزياء الافتراضي — هذا الفحص يثبت أن
+	#    الجاذبية والتصادم يعملان فعلًا على المحرّك الحالي، لا أن المنطق سليم فقط.
+	_check(_player.call("is_on_floor") == true, "Player should rest on the ground (physics engine working?)")
+
+	# 7) الضرر على القلعة ثم حالة الهزيمة.
 	var current_before: int = int(_core.current_health)
 	_core.call("take_damage", 50)
 	_check(int(_core.current_health) == current_before - 50, "Castle core did not register damage")
