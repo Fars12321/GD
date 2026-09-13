@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="2_player"]
@@ -11,6 +11,11 @@
 [ext_resource type="PackedScene" path="res://assets/models/nature/Rock_1_A_Color1.gltf" id="9_rock1"]
 [ext_resource type="PackedScene" path="res://assets/models/nature/Rock_2_A_Color1.gltf" id="10_rock2"]
 [ext_resource type="PackedScene" path="res://scenes/BuildingManager.tscn" id="11_buildmgr"]
+[ext_resource type="Script" path="res://scripts/day_night_manager.gd" id="12_daynight"]
+[ext_resource type="Script" path="res://scripts/wave_spawner.gd" id="13_waves"]
+[ext_resource type="Script" path="res://scripts/castle_core.gd" id="14_core"]
+[ext_resource type="Script" path="res://scripts/roguelite_director.gd" id="15_director"]
+[ext_resource type="PackedScene" path="res://scenes/ui/UpgradeOverlay.tscn" id="16_overlay"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(40, 1, 40)
@@ -30,6 +35,13 @@ ambient_light_color = Color(0.7, 0.76, 0.86, 1)
 ambient_light_energy = 0.72
 tonemap_mode = 2
 glow_enabled = true
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_world"]
+vertices = PackedVector3Array(-19, 0, -19, 19, 0, -19, 19, 0, 19, -19, 0, 19)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_castle"]
+size = Vector3(3, 2.2, 3)
 
 [sub_resource type="BoxMesh" id="KeepMesh"]
 size = Vector3(3.0, 2.2, 3.0)
@@ -73,14 +85,24 @@ shape = SubResource("BoxShape3D_ground")
 mesh = SubResource("PlaneMesh_ground")
 material_override = SubResource("GroundMaterial")
 
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_world")
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-48, -28, 0)
 light_energy = 1.05
 light_color = Color(1, 0.92, 0.78, 1)
 shadow_enabled = false
 
-[node name="CastleCore" type="Node3D" parent="."]
-position = Vector3(0, 0, -4.5)
+[node name="CastleCore" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.5)
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("14_core")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CastleCore"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("BoxShape3D_castle")
 
 [node name="Keep" type="MeshInstance3D" parent="CastleCore"]
 position = Vector3(0, 1.1, 0)
@@ -153,3 +175,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 2)
 resource_type = 1
 total_amount = 8
 model_override = ExtResource("10_rock2")
+
+[node name="DayNightManager" type="Node" parent="."]
+script = ExtResource("12_daynight")
+day_duration = 40.0
+night_duration = 60.0
+
+[node name="WaveSpawner" type="Node3D" parent="."]
+script = ExtResource("13_waves")
+
+[node name="UpgradeOverlay" parent="." instance=ExtResource("16_overlay")]
+
+[node name="RogueliteDirector" type="Node" parent="."]
+script = ExtResource("15_director")

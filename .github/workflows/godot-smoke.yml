@@ -1,24 +1,46 @@
-name: Godot Phase 3 Runner
+name: Godot CI
 
 on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [ main, godot-ci-phase3 ]
+    branches: [ main, godot-ci-phase3, arena/01a09b88-gd ]
 
 jobs:
+  static:
+    name: Static project check (no Godot needed)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct project assets
+        run: bash ci/bootstrap_assets.sh
+
+      - name: Verify scenes, node paths, resources and groups
+        run: python3 ci/static_check.py
+
   godot:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout full asset repository
         uses: actions/checkout@v4
 
-      - name: Install Godot 4.3
+      - name: Install Godot 4.7.2
         uses: chickensoft-games/setup-godot@v2
         with:
-          version: 4.3.0
+          version: 4.7.2
           use-dotnet: false
           include-templates: false
+
+      - name: Verify the installed Godot version
+        run: |
+          version=$(godot --version | head -n 1)
+          echo "Installed: $version"
+          echo "::notice title=godot_version::${version}"
+          case "$version" in
+            4.7.2*) echo "Godot version OK" ;;
+            *) echo "::error title=godot_version::expected 4.7.2 but got ${version}"; exit 1 ;;
+          esac
 
       - name: Reconstruct complete Godot project assets
         run: bash ci/bootstrap_assets.sh
@@ -28,19 +50,63 @@ jobs:
           test -f project.godot
           test -f scenes/Main.tscn
           test -f scripts/building_manager.gd
+          test -f scripts/roguelite_director.gd
+          test -f scripts/day_night_manager.gd
+          test -f scripts/wave_spawner.gd
+          test -f scripts/castle_core.gd
+          test -f scripts/enemy.gd
+          test -f scenes/enemy.tscn
+          test -f scenes/ui/UpgradeOverlay.tscn
           test -f assets/models/castle-kit/wall.glb
           test -f assets/models/castle-kit/tower-square-base.glb
           test -f assets/models/castle-kit/Textures/colormap.png
           test -f assets/models/nature/Tree_1_A_Color1.gltf
           test -f assets/models/nature/Tree_1_A_Color1.bin
           test -f assets/audio/ui/switch1.ogg
+          test -f assets/characters/Skeleton_Warrior.glb
           echo RUNNER_PROJECT_READY
 
-      - name: Run headless smoke test
-        run: godot --headless --path . --script ci/godot_smoke.gd
+      - name: Static project check
+        run: python3 ci/static_check.py
 
       - name: Import project in editor mode
-        run: timeout 30s godot --headless --editor --path . --quit || test $? -eq 124
+        run: timeout 60s godot --headless --editor --path . --quit || test $? -eq 124
+
+      - name: Run headless smoke test
+        run: |
+          set +e
+          timeout 60s godot --headless --path . --script ci/godot_smoke.gd > smoke.log 2>&1
+          code=$?
+          cat smoke.log
+          if grep -qE "SCRIPT ERROR|Parse Error" smoke.log; then
+            echo "Script errors present in output -> failing the step"
+            code=1
+          fi
+          summary=$(grep -E "SMOKE_PASS|SMOKE_FAIL" smoke.log | tail -n 1)
+          echo "::notice title=godot_smoke::${summary}"
+          if [ "$code" -ne 0 ]; then
+            msg=$(tail -n 60 smoke.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/$/%0A/' | tr -d '\n')
+            echo "::error title=godot_smoke::${msg}"
+          fi
+          exit $code
+
+      - name: Run headless roguelite smoke test
+        run: |
+          set +e
+          timeout 60s godot --headless --path . --script ci/godot_smoke_roguelite.gd > roguelite.log 2>&1
+          code=$?
+          cat roguelite.log
+          if grep -qE "SCRIPT ERROR|Parse Error" roguelite.log; then
+            echo "Script errors present in output -> failing the step"
+            code=1
+          fi
+          summary=$(grep -E "SMOKE_PASS|SMOKE_FAIL" roguelite.log | tail -n 1)
+          echo "::notice title=roguelite_smoke::${summary}"
+          if [ "$code" -ne 0 ]; then
+            msg=$(tail -n 60 roguelite.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/$/%0A/' | tr -d '\n')
+            echo "::error title=roguelite_smoke::${msg}"
+          fi
+          exit $code
 
       - name: Render Phase 3 screenshot under Xvfb
         run: |
@@ -50,6 +116,7 @@ jobs:
 
       - name: Package reconstructed runner project
         run: |
+          mkdir -p artifacts
           zip -qr artifacts/VillageDefense_Phase3_RunnerReady.zip \
             project.godot scenes scripts assets
 

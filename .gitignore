@@ -1,0 +1,10 @@
+# Godot
+.godot/
+*.tmp
+
+# الأصول يُعاد بناؤها من ملفات ZIP عبر ci/bootstrap_assets.sh — لا تُلتزم
+assets/
+.ci_asset_extract/
+
+# مخرجات CI
+artifacts/
