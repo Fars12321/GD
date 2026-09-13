@@ -112,8 +112,9 @@ func _on_gather_target_changed(target: Node) -> void:
 	if target == null:
 		target_label.text = "اقترب من شجرة أو صخرة"
 		return
-	var resource_name := target.get_resource_name() if target.has_method("get_resource_name") else "مورد"
-	var remaining := target.get_remaining_amount() if target.has_method("get_remaining_amount") else 0
+	# أنواع صريحة: target من نوع Node، فالاستدعاء يعيد Variant ولا يمكن لـ := استنتاج النوع.
+	var resource_name: String = str(target.get_resource_name()) if target.has_method("get_resource_name") else "مورد"
+	var remaining: int = int(target.get_remaining_amount()) if target.has_method("get_remaining_amount") else 0
 	target_label.text = "%s • متبقٍ %d" % [resource_name, remaining]
 	gather_button.text = "جمع %s" % resource_name
 

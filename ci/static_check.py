@@ -326,6 +326,11 @@ def check_scripts() -> None:
             elif name not in ("health_changed",) and not name.startswith("_"):
                 # قد تكون إشارة على عقدة أخرى — تحذير فقط
                 warn(f"{rel}: {name}.emit( ...) — \"{name}\" not declared in this file")
+        # 6) `var x := <ternary>` — المحرّك يعطي Parse Error لأن الطرفَين Variant.
+        #    هذا هو العطل الذي أسقط ui.gd في CI (Godot 4.3: "Cannot infer the type…").
+        for number, line in enumerate(strip_noise(text).splitlines(), 1):
+            if re.match(r"\s*var \w+\s*:=.*\bif\b.*\belse\b", line):
+                err(f"{rel}:{number}: `var x := ... if ... else ...` cannot infer a type — declare it explicitly")
         # 5) class_name مكرر
         for m in re.finditer(r"^class_name (\w+)", text, re.M):
             CLASS_NAMES[m.group(1)].append(rel)

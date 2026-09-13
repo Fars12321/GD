@@ -1,8 +1,26 @@
 extends SceneTree
+## اختبار الدخان الأساسي.
+## ملاحظة: assert() في Godot يطبع خطأً لكنه لا يُفشل العملية، لذا نعتمد عدّادًا صريحًا وquit(1).
+
+var _failures: int = 0
+
+func _check(condition: bool, message: String) -> void:
+	if condition:
+		return
+	_failures += 1
+	printerr("FAIL: " + message)
+
+func _finish(label: String) -> void:
+	if _failures == 0:
+		print(label + "_PASS")
+		quit(0)
+	else:
+		printerr(label + "_FAIL failures=%d" % _failures)
+		quit(1)
 
 func _init() -> void:
-	assert(ProjectSettings.get_setting("application/config/name", "") == "Village Defense")
-	assert(ProjectSettings.get_setting("application/run/main_scene", "") == "res://scenes/Main.tscn")
+	_check(ProjectSettings.get_setting("application/config/name", "") == "Village Defense", "application/config/name mismatch")
+	_check(ProjectSettings.get_setting("application/run/main_scene", "") == "res://scenes/Main.tscn", "application/run/main_scene mismatch")
 	for script_path in [
 		"res://scripts/main.gd",
 		"res://scripts/player.gd",
@@ -23,16 +41,20 @@ func _init() -> void:
 		"res://scripts/run_stats.gd",
 		"res://scripts/upgrade_deck.gd",
 	]:
-		assert(load(script_path) != null, "Could not load " + script_path)
+		var script: Script = load(script_path) as Script
+		_check(script != null, "Could not load " + script_path)
 	var main_scene: PackedScene = load("res://scenes/Main.tscn") as PackedScene
-	assert(main_scene != null, "Could not load Main.tscn")
+	if main_scene == null:
+		printerr("FAIL: Main.tscn could not be loaded")
+		quit(1)
+		return
 	var main: Node = main_scene.instantiate()
+	if main == null:
+		printerr("FAIL: Main.tscn could not be instantiated")
+		quit(1)
+		return
 	root.add_child(main)
 	await process_frame
-	assert(main.get_node_or_null("Player") != null, "Player missing")
-	assert(main.get_node_or_null("BuildingManager") != null, "BuildingManager missing")
-	assert(main.get_node_or_null("RogueliteDirector") != null, "RogueliteDirector missing")
-	assert(main.get_node_or_null("DayNightManager") != null, "DayNightManager missing")
-	assert(main.get_node_or_null("UpgradeOverlay") != null, "UpgradeOverlay missing")
-	print("GODOT_SMOKE_PASS")
-	quit(0)
+	for node_name in ["Player", "BuildingManager", "RogueliteDirector", "DayNightManager", "WaveSpawner", "UpgradeOverlay", "CastleCore", "NavigationRegion3D"]:
+		_check(main.get_node_or_null(node_name) != null, node_name + " missing in Main.tscn")
+	_finish("GODOT_SMOKE")
