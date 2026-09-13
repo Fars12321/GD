@@ -14,10 +14,16 @@
 
 ## التشغيل (خطوة إلزامية قبل فتح المشروع)
 
-الأصول النموذجية/الصوتية **غير مُلتزمة في Git** بصورتها النهائية؛ تُعاد بناؤها من ملفات ZIP داخل المستودع:
+الأصول النموذجية/الصوتية **غير مُلتزمة في Git** بصورتها النهائية؛ تُعاد بناؤها من ملفات ZIP داخل المستودع.
 
+**أي نظام (يحتاج Python 3 فقط — يعمل على ويندوز دون bash):**
 ```bash
-bash ci/bootstrap_assets.sh     # يبني مجلد assets/ من ملفات ZIP
+python ci/bootstrap_assets.py
+```
+
+**أو على لينكس/ماك (bash + unzip):**
+```bash
+bash ci/bootstrap_assets.sh
 ```
 
 بعدها افتح `project.godot` في Godot 4.3 وشغّل `scenes/Main.tscn`.
@@ -25,17 +31,31 @@ bash ci/bootstrap_assets.sh     # يبني مجلد assets/ من ملفات ZIP
 
 ## الفحص
 
+**الطريقة الأسهل (كل الأنظمة):**
 ```bash
-bash ci/check_all.sh
+python ci/check_all.py
 ```
 
-ينفّذ: إعادة بناء الأصول ← الفحص الثابت ← اختبارات Godot بلا رأس (إن كان `godot` في PATH، وإلا يتخطّاها).
+**مع تحديد مكان المحرّك يدويًا:**
+```bash
+# لينكس / ماك
+GODOT_BIN=/path/to/godot python ci/check_all.py
+
+# ويندوز (PowerShell)
+$env:GODOT_BIN="C:\godot\Godot_v4.3-stable_win64.exe"; python ci/check_all.py
+```
+
+**أو عبر bash:** `bash ci/check_all.sh`
+
+كلها تنفّذ: إعادة بناء الأصول ← الفحص الثابت ← اختبارات Godot بلا رأس (تُتخطّى إن لم يوجد المحرّك).
 
 | الفحص | ماذا يغطّي | يحتاج Godot؟ |
 |-------|-----------|--------------|
-| `python3 ci/static_check.py` | سلامة `.tscn` (عدد `load_steps`، مراجع `ExtResource`/`SubResource`، وجود الملفات)، **مسارات كل `$Path` و`get_node()` مقابل شجرة المشهد الحقيقية**، مسارات `res://`، خلط الجدولة/المسافات، توازن الأقواس، المجموعات (`add_to_group` ↔ `get_first_node_in_group`) | ❌ لا |
+| `python ci/static_check.py` | سلامة `.tscn` (عدد `load_steps`، مراجع `ExtResource`/`SubResource`، وجود الملفات)، **مسارات كل `$Path` و`get_node()` مقابل شجرة المشهد الحقيقية**، مسارات `res://`، خلط الجدولة/المسافات، توازن الأقواس، المجموعات (`add_to_group` ↔ `get_first_node_in_group`) | ❌ لا |
 | `ci/godot_smoke.gd` | تحميل كل السكربتات + توليد `Main.tscn` والتحقق من العُقد الأساسية | ✅ نعم |
 | `ci/godot_smoke_roguelite.gd` | الدورة ليل/نهار، تولّد الموجات، مكافأة القتل، سحب 3 بطاقات فريدة، الإيقاف المؤقت أثناء الاختيار، تطبيق الترقية، تقدّم اليوم، صحة القلعة، وحالة الهزيمة | ✅ نعم |
+
+**تنزيل Godot 4.3:** من <https://godotengine.org/download/archive/4.3-stable/> — النسخة العادية (ليست `.NET`). الملف التنفيذي واحد لا يحتاج تثبيتًا؛ ضعه في مجلد ومرّر مساره عبر `GODOT_BIN`.
 
 ## التحكم
 
@@ -72,4 +92,9 @@ scenes/ui/UpgradeOverlay.tscn  ← شاشة «اختر بطاقة من 3» + ش�
 ## حالة CI
 
 `.github/workflows/godot-smoke.yml` يشغّل وظيفتين: `static` (بلا Godot) و`godot` (smoke + roguelite smoke + لقطة شاشة + حزمة).
-**ملاحظة:** تشغيلات GitHub Actions متوقفة حاليًا بسبب حدّ الإنفاق في الحساب — رسالة GitHub على التشغيلات هي *"The job was not started because recent account payments have failed…"*. إلى أن يُصلَح ذلك، استخدم `bash ci/check_all.sh` محليًا.
+
+**كل التشغيلات متوقفة بسبب فوترة الحساب، لا بسبب الكود.** آخر دليل (تشغيل `34770908713` على هذا الفرع):
+> *"The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"*
+
+الوظيفتان فشلتا في 3 ثوانٍ دون أن تبدآ — حتى وظيفة `static` التي لا تحتاج Godot، لأن المستودع **خاص** وأي مُشغِّل مستضاف على GitHub يستهلك دقائق مدفوعة.
+إلى أن يُصلَح ذلك من <https://github.com/settings/billing>، استخدم `python ci/check_all.py` محليًا.
