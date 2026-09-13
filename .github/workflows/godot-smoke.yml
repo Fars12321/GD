@@ -72,6 +72,8 @@ jobs:
             echo "Script errors present in output -> failing the step"
             code=1
           fi
+          summary=$(grep -E "SMOKE_PASS|SMOKE_FAIL" smoke.log | tail -n 1)
+          echo "::notice title=godot_smoke::${summary}"
           if [ "$code" -ne 0 ]; then
             msg=$(tail -n 60 smoke.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/$/%0A/' | tr -d '\n')
             echo "::error title=godot_smoke::${msg}"
@@ -88,6 +90,8 @@ jobs:
             echo "Script errors present in output -> failing the step"
             code=1
           fi
+          summary=$(grep -E "SMOKE_PASS|SMOKE_FAIL" roguelite.log | tail -n 1)
+          echo "::notice title=roguelite_smoke::${summary}"
           if [ "$code" -ne 0 ]; then
             msg=$(tail -n 60 roguelite.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/$/%0A/' | tr -d '\n')
             echo "::error title=roguelite_smoke::${msg}"
